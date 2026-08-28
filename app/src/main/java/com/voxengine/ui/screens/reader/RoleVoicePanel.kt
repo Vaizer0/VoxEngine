@@ -58,13 +58,13 @@ internal fun RoleVoicePicker(
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             if (allowDefault) {
                 DropdownMenuItem(
-                    text = { Text("默认（同主音色）") },
+                    text = { Text("Default (same as main voice)") },
                     onClick = { onSelected(null); expanded = false }
                 )
             }
             voices.forEach { voice ->
                 DropdownMenuItem(
-                    text = { Text("${voice.name} - ${voice.description}") },
+                    text = { Text("${voice.uiName} - ${voice.description}") },
                     onClick = { onSelected(voice); expanded = false }
                 )
             }
@@ -86,20 +86,20 @@ internal fun CharacterVoiceEditor(
     var showAddDialog by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf<Pair<String, RoleVoiceStyle>?>(null) }
 
-    Text("角色音色（按说话人）", style = MaterialTheme.typography.bodyMedium)
+    Text("Character voices (by speaker)", style = MaterialTheme.typography.bodyMedium)
     if (roleProfile.characters.isEmpty()) {
         Text(
-            "尚未配置角色音色。对话中识别到这些名字时改用对应音色与风格；未命中的对话仍用对话音色。",
+            "No character voices configured. When dialogue mentions these names, the matching voice and style are used; unmatched dialogue still uses the dialogue voice.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     } else {
         roleProfile.characters.forEach { (name, vs) ->
-            val voiceName = voices.firstOrNull { it.id == vs.voice || it.name == vs.voice }?.name
-                ?: vs.voice ?: "默认"
+            val voiceName = voices.firstOrNull { it.id == vs.voice || it.name == vs.voice }?.uiName
+                ?: (voices.firstOrNull { it.id == vs.voice || it.name == vs.voice }?.name ?: vs.voice ?: "Default")
             val desc = buildString {
-                append("音色：$voiceName")
-                vs.style?.takeIf { it.isNotBlank() }?.let { append(" · 风格：$it") }
+                append("Voice: $voiceName")
+                vs.style?.takeIf { it.isNotBlank() }?.let { append(" · Style: $it") }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -110,21 +110,21 @@ internal fun CharacterVoiceEditor(
                     Text(desc, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 IconButton(onClick = { editing = name to vs }) {
-                    Icon(Icons.Default.Edit, contentDescription = "编辑角色")
+                    Icon(Icons.Default.Edit, contentDescription = "Edit role")
                 }
                 IconButton(onClick = { onRemove(name) }) {
-                    Icon(Icons.Default.Delete, contentDescription = "删除角色")
+                    Icon(Icons.Default.Delete, contentDescription = "Delete role")
                 }
             }
         }
     }
     OutlinedButton(onClick = { showAddDialog = true }, modifier = Modifier.fillMaxWidth()) {
-        Text("+ 添加角色音色")
+        Text("+ Add character voice")
     }
 
     if (showAddDialog) {
         CharacterVoiceDialog(
-            title = "添加角色音色",
+            title = "Add character voice",
             initialName = "",
             initialVoice = null,
             initialStyle = "",
@@ -135,7 +135,7 @@ internal fun CharacterVoiceEditor(
     }
     editing?.let { (name, vs) ->
         CharacterVoiceDialog(
-            title = "编辑角色：$name",
+            title = "Edit role: $name",
             initialName = name,
             initialVoice = vs.voice,
             initialStyle = vs.style ?: "",
@@ -171,14 +171,14 @@ internal fun CharacterVoiceDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("角色名（如：张三）") },
+                    label = { Text("Character name (e.g. John)") },
                     enabled = adding,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
                 RoleVoicePicker(
-                    label = "音色",
-                    selectedName = selectedVoice?.name ?: "请选择音色",
+                    label = "Voice",
+                    selectedName = selectedVoice?.uiName ?: "Select a voice",
                     voices = voices,
                     onSelected = { selectedVoice = it },
                     allowDefault = false
@@ -187,12 +187,12 @@ internal fun CharacterVoiceDialog(
                 OutlinedTextField(
                     value = style,
                     onValueChange = { style = it },
-                    label = { Text("风格（可选）") },
-                    placeholder = { Text("留空用默认风格") },
+                    label = { Text("Style (optional)") },
+                    placeholder = { Text("Leave empty to use default style") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    "提示：朗读时从对话前的「XX说：」识别角色名，匹配则用此音色与风格。",
+                    "Note: during reading, character names are detected from dialogue preceded by \u201CSomeone said:\u201D; matching names use this voice and style.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -202,8 +202,8 @@ internal fun CharacterVoiceDialog(
             TextButton(
                 enabled = name.isNotBlank() && selectedVoice != null,
                 onClick = { onConfirm(name.trim(), selectedVoice!!.id, style) }
-            ) { Text(if (adding) "添加" else "保存") }
+            ) { Text(if (adding) "Add" else "Save") }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
     )
 }

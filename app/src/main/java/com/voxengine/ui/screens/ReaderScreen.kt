@@ -97,10 +97,10 @@ fun ReaderScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("书架") },
+                    title = { Text("Bookshelf") },
                     actions = {
                         IconButton(onClick = { openDocumentLauncher.launch(NOVEL_MIME_TYPES) }) {
-                            Icon(Icons.Default.UploadFile, contentDescription = "导入小说")
+                            Icon(Icons.Default.UploadFile, contentDescription = "Import novel")
                         }
                     }
                 )
@@ -178,7 +178,7 @@ fun ReaderScreen(
             onParagraphLongPress = { index, _ -> viewModel.selectParagraph(index) },
             onCopyParagraph = { paragraph ->
                 clipboard.setText(AnnotatedString(paragraph))
-                viewModel.setStatus("已复制该段")
+                viewModel.setStatus("Paragraph copied")
             },
             onReadFromParagraph = { index -> viewModel.startListening(index) },
             onPreviousPage = { viewModel.previousPage() },

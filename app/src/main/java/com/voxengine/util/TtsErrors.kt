@@ -6,9 +6,9 @@ object TtsErrors {
     fun friendly(error: Throwable?): String {
         val message = error?.message.orEmpty()
         return when {
-            message.contains("429") -> "合成过快被限流，请调大段落间隔或降低并发条数后再试"
-            message.contains("API Key", ignoreCase = true) || message.contains("未配置") -> "API Key 未配置或无效，请在设置中检查"
-            else -> message.ifBlank { "未知错误" }
+            message.contains("429") -> "Synthesis is being rate-limited. Increase the paragraph gap or lower the concurrency and try again."
+            message.contains("API Key", ignoreCase = true) || message.contains("未配置") -> "API Key is not configured or invalid. Please check it in Settings."
+            else -> message.ifBlank { "Unknown error" }
         }
     }
 }

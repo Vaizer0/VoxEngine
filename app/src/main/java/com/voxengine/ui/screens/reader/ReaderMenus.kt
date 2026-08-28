@@ -60,7 +60,7 @@ internal fun ReaderTopMenu(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回书架")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back to bookshelf")
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleMedium)
@@ -69,7 +69,7 @@ internal fun ReaderTopMenu(
                 }
             }
             IconButton(onClick = onImport) {
-                Icon(Icons.Default.UploadFile, contentDescription = "导入小说")
+                Icon(Icons.Default.UploadFile, contentDescription = "Import novel")
             }
         }
     }
@@ -217,17 +217,17 @@ internal fun ReaderBottomMenu(
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 TextButton(enabled = currentChapterIndex > 0, onClick = onPreviousChapter) {
                     Icon(Icons.Default.SkipPrevious, contentDescription = null)
-                    Text("上一章")
+                    Text("Previous chapter")
                 }
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "第${currentPageIndex + 1}/${pageCount.coerceAtLeast(1)}页",
+                    "Page ${currentPageIndex + 1}/${pageCount.coerceAtLeast(1)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.weight(1f))
                 TextButton(enabled = currentChapterIndex < chapters.lastIndex, onClick = onNextChapter) {
-                    Text("下一章")
+                    Text("Next chapter")
                     Icon(Icons.Default.SkipNext, contentDescription = null)
                 }
             }
@@ -244,19 +244,19 @@ internal fun ReaderBottomMenu(
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 ReaderToolButton(
                     icon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
-                    label = "目录",
+                    label = "Catalog",
                     selected = panelMode == READER_PANEL_CATALOG,
                     onClick = { onPanelChange(READER_PANEL_CATALOG) }
                 )
                 ReaderToolButton(
                     icon = { Icon(Icons.Default.SkipPrevious, contentDescription = null) },
-                    label = "上一页",
+                    label = "Previous page",
                     enabled = currentChapterIndex > 0 || currentPageIndex > 0,
                     onClick = onPreviousPage
                 )
                 ReaderToolButton(
                     icon = { Icon(if (isListening && !isPaused) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null) },
-                    label = if (!isListening) "听书" else if (isPaused) "继续" else "暂停",
+                    label = if (!isListening) "Listen" else if (isPaused) "Resume" else "Pause",
                     enabled = canListen || isListening,
                     onClick = {
                         when {
@@ -268,26 +268,26 @@ internal fun ReaderBottomMenu(
                 )
                 ReaderToolButton(
                     icon = { Icon(Icons.Default.Stop, contentDescription = null) },
-                    label = "停止",
+                    label = "Stop",
                     enabled = isListening,
                     onClick = onStopListening
                 )
                 ReaderToolButton(
                     icon = { Icon(Icons.Default.SkipNext, contentDescription = null) },
-                    label = "下一页",
+                    label = "Next page",
                     enabled = currentChapterIndex < chapters.lastIndex || currentPageIndex < pageCount - 1,
                     onClick = onNextPage
                 )
                 ReaderToolButton(
                     icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    label = "设置",
+                    label = "Settings",
                     selected = panelMode == READER_PANEL_SETTINGS,
                     onClick = { onPanelChange(READER_PANEL_SETTINGS) }
                 )
             }
 
             val tip = statusText.ifBlank {
-                if (canListen) "顺序合成，播放时缓存后续段落" else "请先配置当前语音引擎"
+                if (canListen) "Synthesizes in order, caching later paragraphs while playing" else "Please configure the current voice engine first"
             }
             Text(
                 tip,

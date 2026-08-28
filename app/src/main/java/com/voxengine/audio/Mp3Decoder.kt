@@ -35,7 +35,7 @@ object Mp3Decoder {
                         break
                     }
                 }
-                if (trackIndex < 0 || format == null) throw IOException("MP3 中未找到音频轨道")
+                if (trackIndex < 0 || format == null) throw IOException("No audio track found in MP3")
                 extractor.selectTrack(trackIndex)
 
                 val mime = format.getString(MediaFormat.KEY_MIME)!!

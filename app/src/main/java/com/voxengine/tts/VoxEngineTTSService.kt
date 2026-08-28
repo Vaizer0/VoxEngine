@@ -25,7 +25,7 @@ class VoxEngineTTSService : TextToSpeechService() {
     private var settings: SettingsRepository? = null
     @Volatile private var currentEngine = "mimo"
     @Volatile private var currentVoice = "冰糖"
-    @Volatile private var currentStyle = "无"
+    @Volatile private var currentStyle = "None"
     @Volatile private var currentSpeed = 1.0f
     @Volatile private var parallelSynthesis = false
     @Volatile private var ttsConcurrency = 3
@@ -88,7 +88,7 @@ class VoxEngineTTSService : TextToSpeechService() {
 
             Log.d(TAG, "Voice=$currentVoice, Style=$currentStyle, Parallel=$parallelSynthesis, Concurrency=$ttsConcurrency, Speed=$effectiveSpeed")
             LogManager.appendLog("D", TAG, "Voice=$currentVoice, Style=$currentStyle, Parallel=$parallelSynthesis, Concurrency=$ttsConcurrency, Speed=$effectiveSpeed")
-            val style = if (currentStyle == "无") null else currentStyle
+            val style = if (currentStyle == "None") null else currentStyle
 
             // 24kHz PCM16 单声道（MiMo 输出格式）。先用默认采样率 start，分段写出。
             var started = false

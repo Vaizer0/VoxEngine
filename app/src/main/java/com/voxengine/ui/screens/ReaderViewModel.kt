@@ -81,7 +81,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
         }
         viewModelScope.launch {
             settings.defaultStyle.collect { style ->
-                _uiState.update { it.copy(selectedStyle = style.takeIf { s -> s != "无" }.orEmpty()) }
+                _uiState.update { it.copy(selectedStyle = style.takeIf { s -> s != "None" }.orEmpty()) }
             }
         }
         // 设置项：持久值变化时同步到 UiState（作为草稿值，编辑后由对应 commit 持久化）。
@@ -116,8 +116,8 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
         _uiState.update { s ->
             val selected = s.voices.firstOrNull { it.id == s.selectedVoiceId || it.name == s.selectedVoiceId }
             when {
-                selected != null -> s.copy(selectedVoiceId = selected.id, selectedVoiceName = selected.name)
-                s.voices.isNotEmpty() -> s.copy(selectedVoiceId = s.voices.first().id, selectedVoiceName = s.voices.first().name)
+                selected != null -> s.copy(selectedVoiceId = selected.id, selectedVoiceName = selected.uiName)
+                s.voices.isNotEmpty() -> s.copy(selectedVoiceId = s.voices.first().id, selectedVoiceName = s.voices.first().uiName)
                 else -> s
             }
         }
@@ -130,7 +130,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             var firstBook: ReaderBookEntity? = null
             uris.forEach { uri ->
-                val title = queryDisplayName(uri) ?: "本地小说.txt"
+                val title = queryDisplayName(uri) ?: "Local novel.txt"
                 runCatching {
                     getApplication<Application>().contentResolver
                         .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -178,7 +178,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun loadBook() {
         val book = _uiState.value.currentBook ?: return
-        _uiState.update { it.copy(isLoadingBook = true, statusText = "正在解析 ${book.title}") }
+        _uiState.update { it.copy(isLoadingBook = true, statusText = "Parsing ${book.title}") }
         viewModelScope.launch {
             val parsed = withContext(Dispatchers.IO) {
                 runCatching {
@@ -217,7 +217,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
                         pages = pages,
                         pageIndex = pageIndex,
                         selectedParagraphIndex = null,
-                        statusText = "已载入 ${list.size} 章",
+                        statusText = "Loaded ${list.size} chapters",
                         isLoadingBook = false
                     )
                 }
@@ -230,7 +230,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
                         pages = emptyList(),
                         chapterIndex = 0,
                         pageIndex = 0,
-                        statusText = "打开失败: ${error.message}",
+                        statusText = "Failed to open: ${error.message}",
                         isLoadingBook = false
                     )
                 }
@@ -359,7 +359,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun selectParagraph(index: Int) {
-        _uiState.update { it.copy(selectedParagraphIndex = index, statusText = "已选中该段") }
+        _uiState.update { it.copy(selectedParagraphIndex = index, statusText = "Paragraph selected") }
     }
 
     fun clearSelectedParagraph() {
@@ -410,7 +410,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
                 isListening = true,
                 isPaused = false,
                 selectedParagraphIndex = null,
-                statusText = if (paragraphIndex > 0) "已从选中段落开始听书" else "听书已开始"
+                statusText = if (paragraphIndex > 0) "Started listening from selected paragraph" else "Listening started"
             )
         }
     }
@@ -419,20 +419,20 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
         val state = _uiState.value
         if (!state.isListening || state.isPaused) return
         sendPlayback(ReaderPlaybackService.ACTION_PAUSE)
-        _uiState.update { it.copy(isPaused = true, statusText = "听书已暂停") }
+        _uiState.update { it.copy(isPaused = true, statusText = "Listening paused") }
     }
 
     fun resumeListening() {
         val state = _uiState.value
         if (!state.isListening || !state.isPaused) return
         sendPlayback(ReaderPlaybackService.ACTION_RESUME)
-        _uiState.update { it.copy(isPaused = false, statusText = "听书播放中") }
+        _uiState.update { it.copy(isPaused = false, statusText = "Listening") }
     }
 
     fun stopListening() {
         if (!_uiState.value.isListening) return
         sendPlayback(ReaderPlaybackService.ACTION_STOP)
-        _uiState.update { it.copy(isListening = false, isPaused = false, statusText = "听书已停止") }
+        _uiState.update { it.copy(isListening = false, isPaused = false, statusText = "Listening stopped") }
     }
 
     fun syncPlaybackSnapshot(snapshot: PlaybackSnapshot?) {
@@ -446,7 +446,7 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
             it.copy(
                 isListening = true,
                 isPaused = snapshot.isPaused,
-                statusText = if (snapshot.isPaused) "听书已暂停" else "听书播放中"
+                statusText = if (snapshot.isPaused) "Listening paused" else "Listening"
             )
         }
         if (snapshot.chapterIndex in state.chapters.indices &&
@@ -472,13 +472,13 @@ class ReaderViewModel(app: Application) : AndroidViewModel(app) {
     // ---- 音色 / 风格 / 听书设置 ----
 
     fun selectVoice(voice: VoiceInfo) {
-        _uiState.update { it.copy(selectedVoiceId = voice.id, selectedVoiceName = voice.name) }
+        _uiState.update { it.copy(selectedVoiceId = voice.id, selectedVoiceName = voice.uiName) }
         viewModelScope.launch { settings.updateDefaultVoice(voice.id) }
     }
 
     fun setStyle(style: String) {
         _uiState.update { it.copy(selectedStyle = style) }
-        viewModelScope.launch { settings.updateDefaultStyle(style.ifBlank { "无" }) }
+        viewModelScope.launch { settings.updateDefaultStyle(style.ifBlank { "None" }) }
     }
 
     // ---- 分角色朗读 ----
@@ -559,7 +559,7 @@ data class ReaderUiState(
     val isLoadingBook: Boolean = false,
     val statusText: String = "",
     val selectedVoiceId: String = "冰糖",
-    val selectedVoiceName: String = "冰糖",
+    val selectedVoiceName: String = "Bingtang",
     val selectedStyle: String = "",
     val voices: List<VoiceInfo> = emptyList(),
     val isListening: Boolean = false,

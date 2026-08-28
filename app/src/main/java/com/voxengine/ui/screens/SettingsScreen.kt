@@ -60,12 +60,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-// MiMo API 预设 URL
+// MiMo API preset URLs
 private val MIMO_API_PRESETS = listOf(
-    "按量计费" to "https://api.xiaomimimo.com",
-    "Token Plan (中国区)" to "https://token-plan-cn.xiaomimimo.com",
-    "Token Plan (新加坡)" to "https://token-plan-sgp.xiaomimimo.com",
-    "Token Plan (欧洲)" to "https://token-plan-ams.xiaomimimo.com"
+    "Pay-as-you-go" to "https://api.xiaomimimo.com",
+    "Token Plan (China)" to "https://token-plan-cn.xiaomimimo.com",
+    "Token Plan (Singapore)" to "https://token-plan-sgp.xiaomimimo.com",
+    "Token Plan (Europe)" to "https://token-plan-ams.xiaomimimo.com"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,7 +80,7 @@ fun SettingsScreen() {
     val baseUrl by settings.baseUrl.collectAsState(initial = "https://api.xiaomimimo.com")
     val apiKey by settings.apiKey.collectAsState(initial = "")
     val defaultVoice by settings.defaultVoice.collectAsState(initial = "冰糖")
-    val defaultStyle by settings.defaultStyle.collectAsState(initial = "无")
+    val defaultStyle by settings.defaultStyle.collectAsState(initial = "None")
     val speed by settings.speed.collectAsState(initial = 1.0f)
     val darkMode by settings.darkMode.collectAsState(initial = false)
     val currentEngineId by settings.currentEngine.collectAsState(initial = "mimo")
@@ -122,7 +122,7 @@ fun SettingsScreen() {
             com.voxengine.engine.VoiceInfo(
                 id = "custom_${voice.id}",
                 name = voice.name,
-                description = if (voice.type == "clone") "克隆音色" else "设计: ${voice.description}",
+                description = if (voice.type == "clone") "Clone voice" else "Design: ${voice.description}",
                 type = com.voxengine.engine.VoiceType.PRESET,
                 engineId = currentEngineId
             )
@@ -135,15 +135,15 @@ fun SettingsScreen() {
     }
 
     // 当前选中的预设计费模式
-    val currentPreset = MIMO_API_PRESETS.find { it.second == baseUrl }?.first ?: "自定义"
-    val currentPresetDisplay = if (currentPreset == "按量计费") "$currentPreset（限时免费，具体以小米官方为准）" else currentPreset
+    val currentPreset = MIMO_API_PRESETS.find { it.second == baseUrl }?.first ?: "Custom"
+    val currentPresetDisplay = if (currentPreset == "Pay-as-you-go") "$currentPreset (free for a limited time, per Xiaomi official info)" else currentPreset
 
     var userAgentInput by remember { mutableStateOf("") }
     val userAgent by settings.userAgent.collectAsState(initial = "openclaw/unknown")
     LaunchedEffect(userAgent) { userAgentInput = userAgent }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("VoxEngine 设置") }) }
+        topBar = { TopAppBar(title = { Text("VoxEngine Settings") }) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -160,7 +160,7 @@ fun SettingsScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("深色模式")
+                Text("Dark Mode")
                 Switch(
                     checked = darkMode,
                     onCheckedChange = { enabled ->
@@ -183,7 +183,7 @@ fun SettingsScreen() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("并行合成")
+                    Text("Parallel Synthesis")
                     Switch(
                         checked = parallelSynthesis,
                         onCheckedChange = { enabled ->
@@ -193,13 +193,14 @@ fun SettingsScreen() {
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "将长文本拆成短句并行请求，可减少段间等待时间。\n默认关闭，使用整段请求模式。",
+                    "Split long text into short sentences and request them in parallel to reduce waiting time between segments.\n" +
+                    "Disabled by default, uses whole-segment request mode.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (parallelSynthesis) {
                     Spacer(Modifier.height(8.dp))
-                    Text("并发条数: $ttsConcurrency")
+                    Text("Concurrency: $ttsConcurrency")
                     Slider(
                         value = ttsConcurrency.toFloat(),
                         onValueChange = { scope.launch { settings.updateTtsConcurrency(it.toInt()) } },
@@ -207,7 +208,7 @@ fun SettingsScreen() {
                         steps = 6
                     )
                     Text(
-                        "同时在途的请求数。调高首字更快，但过高易触发限流(429)。",
+                        "Number of simultaneous in-flight requests. Higher gives faster first byte, but too high may trigger rate limiting (429).",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -218,7 +219,7 @@ fun SettingsScreen() {
         // 引擎选择
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("引擎选择", style = MaterialTheme.typography.titleMedium)
+                Text("Engine Selection", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
 
                 ExposedDropdownMenuBox(
@@ -229,7 +230,7 @@ fun SettingsScreen() {
                         value = activeEngine?.name ?: currentEngineId,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("TTS 引擎") },
+                        label = { Text("TTS Engine") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = engineExpanded) },
                         modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                     )
@@ -261,18 +262,18 @@ fun SettingsScreen() {
         // API 配置
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("API 配置", style = MaterialTheme.typography.titleMedium)
+                Text("API Configuration", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
 
                 if (currentEngineId != "mimo") {
                     Text(
-                        "Edge TTS 无需 API Key 或 Base URL 配置。",
+                        "Edge TTS requires no API Key or Base URL configuration.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
                     // MiMo 预设计费模式选择
-                    Text("计费模式", style = MaterialTheme.typography.bodyMedium)
+                    Text("Billing Mode", style = MaterialTheme.typography.bodyMedium)
                     Spacer(Modifier.height(4.dp))
                     ExposedDropdownMenuBox(
                         expanded = presetExpanded,
@@ -282,7 +283,7 @@ fun SettingsScreen() {
                             value = currentPresetDisplay,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("计费模式") },
+                            label = { Text("Billing Mode") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = presetExpanded) },
                             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         )
@@ -303,7 +304,7 @@ fun SettingsScreen() {
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "💡 按量计费使用 sk-xxxxx 格式 API Key（限时免费）\n💡 Token Plan 使用 tp-xxxxx 格式 API Key",
+                        "💡 Pay-as-you-go uses sk-xxxxx format API Key (free for a limited time)\n💡 Token Plan uses tp-xxxxx format API Key",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -329,7 +330,7 @@ fun SettingsScreen() {
                         IconButton(onClick = { apiKeyVisible = !apiKeyVisible }) {
                             Icon(
                                 imageVector = if (apiKeyVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = if (apiKeyVisible) "隐藏" else "显示"
+                                contentDescription = if (apiKeyVisible) "Hide" else "Show"
                             )
                         }
                     }
@@ -348,7 +349,7 @@ fun SettingsScreen() {
                             (EngineRegistry.get("mimo") as? MiMoEngine)
                                 ?.updateClientConfig(baseUrlInput, apiKeyInput, userAgent)
                         }
-                    }) { Text("保存 API 配置") }
+                    }) { Text("Save API Config") }
 
                     OutlinedButton(onClick = {
                         scope.launch {
@@ -360,7 +361,7 @@ fun SettingsScreen() {
                             (EngineRegistry.get("mimo") as? MiMoEngine)
                                 ?.updateClientConfig("https://api.xiaomimimo.com", "", "openclaw/unknown")
                         }
-                    }) { Text("清除配置") }
+                    }) { Text("Clear Config") }
                 }
                 }
             }
@@ -370,7 +371,7 @@ fun SettingsScreen() {
         // 自定义 User-Agent
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("自定义请求头", style = MaterialTheme.typography.titleMedium)
+                Text("Custom Request Header", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = userAgentInput,
@@ -381,7 +382,7 @@ fun SettingsScreen() {
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "默认使用 openclaw/unknown，用于伪装客户端身份",
+                    "Defaults to openclaw/unknown, used to disguise the client identity",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -392,7 +393,7 @@ fun SettingsScreen() {
         // 默认语音
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("默认语音", style = MaterialTheme.typography.titleMedium)
+                Text("Default Voice", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
 
                 ExposedDropdownMenuBox(
@@ -403,7 +404,7 @@ fun SettingsScreen() {
                         value = defaultVoice,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("默认音色") },
+                        label = { Text("Default Voice") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceExpanded) },
                         modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                     )
@@ -415,14 +416,14 @@ fun SettingsScreen() {
                         if (presetVoices.isNotEmpty()) {
                             DropdownMenuItem(
                                 text = { 
-                                    Text("预设音色", style = MaterialTheme.typography.labelSmall,
+                                    Text("Preset Voices", style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.primary) 
                                 },
                                 onClick = { /* 分组标题，不处理 */ }
                             )
                             presetVoices.forEach { voice ->
                                 DropdownMenuItem(
-                                    text = { Text("${voice.name} - ${voice.description}") },
+                                    text = { Text("${voice.uiName} - ${voice.description}") },
                                     onClick = {
                                         scope.launch { settings.updateDefaultVoice(voice.name) }
                                         voiceExpanded = false
@@ -435,7 +436,7 @@ fun SettingsScreen() {
                         if (customVoices.isNotEmpty()) {
                             DropdownMenuItem(
                                 text = { 
-                                    Text("自定义音色", style = MaterialTheme.typography.labelSmall,
+                                    Text("Custom Voices", style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.primary) 
                                 },
                                 onClick = { /* 分组标题，不处理 */ }
@@ -443,7 +444,7 @@ fun SettingsScreen() {
                             customVoices.forEach { voice ->
                                 DropdownMenuItem(
                                     text = { 
-                                        Text("${voice.name} - ${if (voice.type == "clone") "克隆" else "设计"}") 
+                                        Text("${voice.name} - ${if (voice.type == "clone") "Clone" else "Design"}") 
                                     },
                                     onClick = {
                                         scope.launch { settings.updateDefaultVoice(voice.name) }
@@ -464,8 +465,8 @@ fun SettingsScreen() {
                         OutlinedTextField(
                             value = styleInput,
                             onValueChange = { styleInput = it },
-                            label = { Text("默认风格") },
-                            placeholder = { Text("如：温柔磁性") },
+                            label = { Text("Default Style") },
+                            placeholder = { Text("e.g. Gentle & magnetic") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = styleExpanded) },
                             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryEditable),
                             singleLine = true,
@@ -496,7 +497,7 @@ fun SettingsScreen() {
                     Spacer(Modifier.height(8.dp))
                 }
 
-                Text("语速: ${String.format(Locale.getDefault(), "%.1f", speed)}x")
+                Text("Speed: ${String.format(Locale.getDefault(), "%.1f", speed)}x")
                 Slider(
                     value = speed,
                     onValueChange = { scope.launch { settings.updateSpeed(it) } },
@@ -506,7 +507,7 @@ fun SettingsScreen() {
 
                 if (currentEngineId == "mimo") {
                     Spacer(Modifier.height(8.dp))
-                    Text("采样温度: ${String.format(Locale.getDefault(), "%.2f", defaultTemperature)}")
+                    Text("Sampling Temperature: ${String.format(Locale.getDefault(), "%.2f", defaultTemperature)}")
                     Slider(
                         value = defaultTemperature,
                         onValueChange = { scope.launch { settings.updateDefaultTemperature(it) } },
@@ -514,8 +515,8 @@ fun SettingsScreen() {
                         steps = 14
                     )
                     Text(
-                        "控制合成随机性。值越低越稳定一致，值越高越多样自然。\n" +
-                        "克隆/听书建议 0.1–0.3 以减少句间风格漂移；预设音色可用默认 0.6。",
+                        "Controls synthesis randomness. Lower values are more stable and consistent, higher values are more varied and natural.\n" +
+                        "For clone/listen mode we recommend 0.1-0.3 to reduce style drift between sentences; preset voices can use the default 0.6.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -531,9 +532,9 @@ fun SettingsScreen() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("系统 TTS 设置", style = MaterialTheme.typography.titleMedium)
+                    Text("System TTS Settings", style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "跳转到系统文字转语音设置页面，将 VoxEngine 设为首选引擎",
+                        "Jump to the system text-to-speech settings page to set VoxEngine as the preferred engine",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -544,22 +545,22 @@ fun SettingsScreen() {
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         context.startActivity(intent)
                     } catch (_: Exception) {
-                        Toast.makeText(context, "无法打开系统 TTS 设置", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Unable to open system TTS settings", Toast.LENGTH_SHORT).show()
                     }
-                }) { Text("前往设置") }
+                }) { Text("Go to Settings") }
             }
         }
 
         // 使用说明
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("使用说明", style = MaterialTheme.typography.titleMedium)
+                Text("Usage Guide", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "1. 在上方设置好 API Key\n" +
-                    "2. 系统设置 → 语言和输入 → 文字转语音\n" +
-                    "3. 选择 VoxEngine 为首选引擎\n" +
-                    "4. 在阅读 APP 中选择系统默认引擎即可",
+                    "1. Set up your API Key above\n" +
+                    "2. System Settings → Language & Input → Text-to-speech\n" +
+                    "3. Select VoxEngine as the preferred engine\n" +
+                    "4. In your reading app, select the system default engine",
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -585,6 +586,6 @@ private suspend fun switchEngine(
         settings.updateDefaultVoice(availableVoiceNames.first())
     }
     if (styles.isEmpty() || currentStyle !in styles) {
-        settings.updateDefaultStyle("无")
+        settings.updateDefaultStyle("None")
     }
 }

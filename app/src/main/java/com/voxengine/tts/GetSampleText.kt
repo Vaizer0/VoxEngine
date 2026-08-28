@@ -18,6 +18,7 @@ class GetSampleText : Activity() {
         // 根据语言返回示例文本
         val sampleText = when (language) {
             "zho", "chi", "zh" -> "你好，这是语音合成的示例。"
+            "jpn", "ja" -> "こんにちは、これは音声合成のサンプルテキストです。"
             else -> "Hello, this is a sample text for speech synthesis."
         }
 

@@ -27,13 +27,13 @@ object EpubNovelParser {
     fun parse(bytes: ByteArray): List<TxtChapter> {
         val entries = readArchive(bytes)
         val container = entries["META-INF/container.xml"]
-            ?: throw IllegalArgumentException("不是有效的 EPUB 文件：缺少 container.xml")
+            ?: throw IllegalArgumentException("Invalid EPUB file: missing container.xml")
         val containerDoc = parseXml(container)
         val packagePath = containerDoc.selectFirst("rootfile[full-path]")?.attr("full-path")
             ?.let(::decodePath)?.let(::normalizeArchivePath)
-            ?: throw IllegalArgumentException("EPUB 未声明内容清单")
+            ?: throw IllegalArgumentException("EPUB does not declare a content manifest")
         val packageBytes = entries[packagePath]
-            ?: throw IllegalArgumentException("EPUB 内容清单不存在")
+            ?: throw IllegalArgumentException("EPUB content manifest not found")
         val packageDoc = parseXml(packageBytes)
         val packageDir = packagePath.substringBeforeLast('/', "")
 
@@ -47,7 +47,7 @@ object EpubNovelParser {
         val spine = packageDoc.select("spine > itemref[idref]")
             .mapNotNull { manifest[it.attr("idref")] }
             .filter { it.mediaType == "application/xhtml+xml" || it.mediaType == "text/html" }
-        if (spine.isEmpty()) throw IllegalArgumentException("EPUB 没有可阅读的正文")
+        if (spine.isEmpty()) throw IllegalArgumentException("EPUB has no readable content")
 
         val tocTitles = buildTocTitles(entries, packageDoc, manifest, packageDir)
         val chapters = spine.mapIndexedNotNull { index, item ->
@@ -58,10 +58,10 @@ object EpubNovelParser {
             if (text.isBlank()) return@mapIndexedNotNull null
             val title = tocTitles[item.path]
                 ?: document.selectFirst("h1, h2, h3, title")?.text()?.trim()?.takeIf(String::isNotBlank)
-                ?: "第${index + 1}章"
+                ?: "Chapter ${index + 1}"
             TxtChapter(title = title, content = removeRepeatedTitle(text, title))
         }
-        if (chapters.isEmpty()) throw IllegalArgumentException("EPUB 正文为空")
+        if (chapters.isEmpty()) throw IllegalArgumentException("EPUB content is empty")
         return chapters
     }
 
@@ -124,12 +124,12 @@ object EpubNovelParser {
             while (true) {
                 val entry = zip.nextEntry ?: break
                 entryCount += 1
-                if (entryCount > MAX_ENTRY_COUNT) throw IllegalArgumentException("EPUB 文件条目过多")
+                if (entryCount > MAX_ENTRY_COUNT) throw IllegalArgumentException("EPUB file has too many entries")
                 if (!entry.isDirectory) {
                     val path = normalizeArchivePath(decodePath(entry.name))
                     val content = zip.readBytesLimited(MAX_ENTRY_SIZE)
                     totalSize += content.size
-                    if (totalSize > MAX_TOTAL_SIZE) throw IllegalArgumentException("EPUB 解压后内容过大")
+                    if (totalSize > MAX_TOTAL_SIZE) throw IllegalArgumentException("EPUB content too large after extraction")
                     entries[path] = content
                 }
                 zip.closeEntry()
@@ -157,7 +157,7 @@ object EpubNovelParser {
             val count = read(buffer)
             if (count < 0) break
             total += count
-            if (total > limit) throw IllegalArgumentException("EPUB 单个文件过大")
+            if (total > limit) throw IllegalArgumentException("EPUB file too large")
             output.write(buffer, 0, count)
         }
         return output.toByteArray()
@@ -176,7 +176,7 @@ object EpubNovelParser {
         path.replace('\\', '/').split('/').forEach { part ->
             when (part) {
                 "", "." -> Unit
-                ".." -> if (parts.isNotEmpty()) parts.removeAt(parts.lastIndex) else throw IllegalArgumentException("EPUB 包含非法路径")
+                ".." -> if (parts.isNotEmpty()) parts.removeAt(parts.lastIndex) else throw IllegalArgumentException("EPUB contains invalid path")
                 else -> parts += part
             }
         }

@@ -57,7 +57,7 @@ class MiMoTTSClient(
         val startTime = System.currentTimeMillis()
         val content = text
         // 风格作为自然语言指令放进 user 消息，而非拼进正文，避免服务端把提示词当文本读出来。
-        val styleInstruction = style?.trim()?.takeIf { it.isNotEmpty() && it != "无" }
+        val styleInstruction = style?.trim()?.takeIf { it.isNotEmpty() && it != "None" }
 
         // 根据模型类型构建不同的请求体
         val (userContent, assistantContent, audioConfig) = when (model) {
@@ -91,7 +91,7 @@ class MiMoTTSClient(
         )
 
         val json = gson.toJson(request)
-        val styleInfo = style?.takeIf { it != "无" }?.let { " style=$it" }.orEmpty()
+        val styleInfo = style?.takeIf { it != "None" }?.let { " style=$it" }.orEmpty()
         Log.d(TAG, "Request model=$model voice=$voice textLength=${content.length}$styleInfo")
         LogManager.appendLog("D", TAG, "Request model=$model voice=$voice textLength=${content.length}$styleInfo")
 
@@ -148,14 +148,14 @@ class MiMoTTSClient(
         const val MODEL_DESIGN = "mimo-v2.5-tts-voicedesign"
 
         val PRESET_VOICES = listOf(
-            VoiceInfo("冰糖", "冰糖", "甜美可爱女声", MODEL_PRESET),
-            VoiceInfo("茉莉", "茉莉", "温柔知性女声", MODEL_PRESET),
-            VoiceInfo("苏打", "苏打", "活力阳光男声", MODEL_PRESET),
-            VoiceInfo("白桦", "白桦", "沉稳磁性男声", MODEL_PRESET),
-            VoiceInfo("Mia", "Mia", "英文女声", MODEL_PRESET),
-            VoiceInfo("Chloe", "Chloe", "英文女声", MODEL_PRESET),
-            VoiceInfo("Milo", "Milo", "英文男声", MODEL_PRESET),
-            VoiceInfo("Dean", "Dean", "英文男声", MODEL_PRESET)
+            VoiceInfo("冰糖", "冰糖", "Sweet cute female", MODEL_PRESET),
+            VoiceInfo("茉莉", "茉莉", "Gentle graceful female", MODEL_PRESET),
+            VoiceInfo("苏打", "苏打", "Energetic sunny male", MODEL_PRESET),
+            VoiceInfo("白桦", "白桦", "Deep magnetic male", MODEL_PRESET),
+            VoiceInfo("Mia", "Mia", "English female", MODEL_PRESET),
+            VoiceInfo("Chloe", "Chloe", "English female", MODEL_PRESET),
+            VoiceInfo("Milo", "Milo", "English male", MODEL_PRESET),
+            VoiceInfo("Dean", "Dean", "English male", MODEL_PRESET)
         )
 
         /**

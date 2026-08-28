@@ -37,7 +37,7 @@ internal fun CatalogPanel(
 
     Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.42f)) {
         Text(
-            "目录 · 共${chapters.size}章",
+            "Catalog · ${chapters.size} chapters",
             style = MaterialTheme.typography.titleSmall,
             fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
             modifier = Modifier.padding(bottom = 6.dp)

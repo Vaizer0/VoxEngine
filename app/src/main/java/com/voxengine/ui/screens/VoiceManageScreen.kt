@@ -102,7 +102,7 @@ fun VoiceManageScreen() {
                 context.contentResolver.openOutputStream(it)?.use { os ->
                     os.write(json.toByteArray())
                 }
-                Toast.makeText(context, "已导出 ${allVoices.size} 个音色", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Exported ${allVoices.size} voices", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -118,16 +118,16 @@ fun VoiceManageScreen() {
                     val type = object : TypeToken<List<VoiceEntity>>() {}.type
                     val parsed: List<VoiceEntity> = Gson().fromJson(json, type)
                     val count = viewModel.importVoices(parsed)
-                    Toast.makeText(context, "导入完成，新增 $count 个音色", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Import complete, added $count voices", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    Toast.makeText(context, "导入失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Import failed: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("音色管理 - $activeEngineName") }) }
+        topBar = { TopAppBar(title = { Text("Voice Management - $activeEngineName") }) }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
@@ -142,16 +142,16 @@ fun VoiceManageScreen() {
                     OutlinedButton(
                         onClick = { exportLauncher.launch("voxengine_voices.json") },
                         modifier = Modifier.weight(1f)
-                    ) { Text("导出音色", style = MaterialTheme.typography.bodySmall) }
+                    ) { Text("Export Voices", style = MaterialTheme.typography.bodySmall) }
                     OutlinedButton(
                         onClick = { importLauncher.launch(arrayOf("application/json")) },
                         modifier = Modifier.weight(1f)
-                    ) { Text("导入音色", style = MaterialTheme.typography.bodySmall) }
+                    ) { Text("Import Voices", style = MaterialTheme.typography.bodySmall) }
                 }
             }
 
             item {
-                Text("预设音色", style = MaterialTheme.typography.titleMedium)
+                Text("Preset Voices", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
             }
             items(presetVoices) { voice ->
@@ -167,13 +167,13 @@ fun VoiceManageScreen() {
                             VoiceMetaLine(gender = voice.gender, ageGroup = voice.ageGroup, tags = voice.tags)
                         }
                         IconButton(
-                            onClick = { viewModel.previewVoice(voice.name, "你好，我是${voice.name}，这是试听。") },
+                            onClick = { viewModel.previewVoice(voice.name, "Hello, this is a voice preview.") },
                             enabled = !isPlaying
                         ) {
                             if (previewingVoice == voice.name && isPlaying) {
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             } else {
-                                Icon(Icons.Default.PlayArrow, "试听")
+                                Icon(Icons.Default.PlayArrow, "Preview")
                             }
                         }
                     }
@@ -183,16 +183,16 @@ fun VoiceManageScreen() {
             if (voices.isNotEmpty()) {
                 item {
                     Spacer(Modifier.height(16.dp))
-                    Text("自定义音色", style = MaterialTheme.typography.titleMedium)
+                    Text("Custom Voices", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
                 }
                 // 按性别分组：男声 / 女声 / 中性 / 未分类，便于按角色挑音色。
                 val grouped = voices.groupBy { it.gender ?: "unspecified" }
                 val sectionOrder = listOf(
-                    com.voxengine.engine.VoiceGender.MALE to "男声",
-                    com.voxengine.engine.VoiceGender.FEMALE to "女声",
-                    com.voxengine.engine.VoiceGender.NEUTRAL to "中性",
-                    "unspecified" to "未分类"
+                    com.voxengine.engine.VoiceGender.MALE to "Male",
+                    com.voxengine.engine.VoiceGender.FEMALE to "Female",
+                    com.voxengine.engine.VoiceGender.NEUTRAL to "Neutral",
+                    "unspecified" to "Unclassified"
                 )
                 sectionOrder.forEach { (key, label) ->
                     val group = grouped[key]
@@ -215,7 +215,7 @@ fun VoiceManageScreen() {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(voice.name, style = MaterialTheme.typography.bodyLarge)
                                         Text(
-                                            if (voice.type == "clone") "克隆音色" else "设计: ${voice.description}",
+                                            if (voice.type == "clone") "Clone Voice" else "Design: ${voice.description}",
                                             style = MaterialTheme.typography.bodySmall
                                         )
                                         VoiceMetaLine(
@@ -225,20 +225,20 @@ fun VoiceManageScreen() {
                                         )
                                     }
                                     IconButton(
-                                        onClick = { viewModel.previewVoice(voice.name, "你好，这是试听。") },
+                                        onClick = { viewModel.previewVoice(voice.name, "Hello, this is a voice preview.") },
                                         enabled = !isPlaying
                                     ) {
                                         if (previewingVoice == voice.name && isPlaying) {
                                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                                         } else {
-                                            Icon(Icons.Default.PlayArrow, "试听")
+                                            Icon(Icons.Default.PlayArrow, "Preview")
                                         }
                                     }
                                     IconButton(onClick = { editingVoice = voice }) {
-                                        Icon(Icons.Default.Edit, "编辑标签")
+                                        Icon(Icons.Default.Edit, "Edit tags")
                                     }
                                     IconButton(onClick = { viewModel.deleteVoice(voice.id) }) {
-                                        Icon(Icons.Default.Delete, "删除")
+                                        Icon(Icons.Default.Delete, "Delete")
                                     }
                                 }
                             }
@@ -258,7 +258,7 @@ fun VoiceManageScreen() {
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("设计新音色（文字描述生成）")
+                            Text("Design New Voice (description-based)")
                         }
                     }
                     if (supportsClone) {
@@ -268,7 +268,7 @@ fun VoiceManageScreen() {
                         ) {
                             Icon(Icons.Default.Mic, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("克隆音色（音频录制/上传）")
+                            Text("Clone Voice (record/upload audio)")
                         }
                     }
                 }
@@ -345,7 +345,7 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
         if (granted) {
             // permission granted, user can tap record again
         } else {
-            Toast.makeText(context, "需要录音权限才能录制音频", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Recording permission is required to capture audio", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -390,7 +390,7 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
                     if (isRecording) {
                         recordedSeconds = (System.currentTimeMillis() - startTime) / 1000
                         cloneVoiceHint = if (recordedSeconds > 10) {
-                            "参考音频已经超过10秒。如果后续克隆失败，请缩短到10秒以内再试。"
+                            "The reference audio is over 10 seconds. If cloning fails later, please shorten it to under 10 seconds and retry."
                         } else {
                             ""
                         }
@@ -412,7 +412,7 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
                 recorder = null
                 recordedSeconds = (System.currentTimeMillis() - startTime) / 1000
                 cloneVoiceHint = if (recordedSeconds > 10) {
-                    "参考音频已经超过10秒。如果后续克隆失败，请缩短到10秒以内再试。"
+                    "The reference audio is over 10 seconds. If cloning fails later, please shorten it to under 10 seconds and retry."
                 } else {
                     ""
                 }
@@ -432,17 +432,17 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
             if (isRecording) stopRecording()
             onDismiss()
         },
-        title = { Text("添加克隆音色") },
+        title = { Text("Add Clone Voice") },
         text = {
             Column {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("名称") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("描述") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextButton(onClick = { launcher.launch("audio/*") }) {
-                        Text(if (audioUri != null) "已选择文件" else "选择音频文件")
+                        Text(if (audioUri != null) "File selected" else "Choose audio file")
                     }
                     Spacer(Modifier.width(8.dp))
                     TextButton(
@@ -451,20 +451,20 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
                         }
                     ) {
                         if (isRecording) {
-                            Icon(Icons.Default.Stop, "停止", tint = Color.Red, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Stop, "Stop", tint = Color.Red, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("停止 (${recordedSeconds}s)", color = Color.Red)
+                            Text("Stop (${recordedSeconds}s)", color = Color.Red)
                         } else {
-                            Icon(Icons.Default.Mic, "录音", modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Mic, "Record", modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("录音")
+                            Text("Record")
                         }
                     }
                 }
 
                 if (audioBase64.isNotBlank()) {
                     Text(
-                        if (audioUri != null) "已选择音频文件" else if (!isRecording && recordedSeconds > 0) "已录制 ${recordedSeconds}秒" else "",
+                        if (audioUri != null) "Audio file selected" else if (!isRecording && recordedSeconds > 0) "Recorded ${recordedSeconds}s" else "",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -481,7 +481,7 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
 
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "提示：不会自动截断录音；建议录制10秒以内的清晰人声。若克隆失败，请缩短录音时间后重试。音频仅支持 WAV/MP3 格式，Base64 编码后不超过 10MB。",
+                    "Note: recording is not auto-trimmed; it is recommended to record clear speech within 10 seconds. If cloning fails, shorten the recording and retry. Audio supports WAV/MP3 only, Base64-encoded size must not exceed 10MB.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -491,16 +491,16 @@ fun CloneVoiceDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> 
             TextButton(
                 onClick = {
                     if (recordedSeconds > 10) {
-                        Toast.makeText(context, "参考音频超过10秒，若克隆失败请缩短后重试", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Reference audio is over 10 seconds; if cloning fails, shorten and retry", Toast.LENGTH_LONG).show()
                     }
                     onSave(name, description, audioBase64)
                 },
                 enabled = name.isNotBlank() && audioBase64.isNotBlank()
             ) {
-                Text("保存")
+                Text("Save")
             }
         },
-        dismissButton = { TextButton(onClick = { if (isRecording) stopRecording(); onDismiss() }) { Text("取消") } }
+        dismissButton = { TextButton(onClick = { if (isRecording) stopRecording(); onDismiss() }) { Text("Cancel") } }
     )
 }
 
@@ -516,16 +516,16 @@ fun DesignVoiceDialog(onDismiss: () -> Unit, onSave: (String, String) -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("设计新音色") },
+        title = { Text("Design New Voice") },
         text = {
             Column {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("名称") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("音色描述") },
-                    placeholder = { Text("例如：一个温柔的年轻女性声音，语速缓慢") },
+                    label = { Text("Voice description") },
+                    placeholder = { Text("e.g. a gentle young female voice, slow pace") },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2
                 )
@@ -555,17 +555,17 @@ fun DesignVoiceDialog(onDismiss: () -> Unit, onSave: (String, String) -> Unit) {
                     if (isPreviewing) {
                         CircularProgressIndicator(modifier = Modifier.size(16.dp))
                     } else {
-                        Text("试听音色")
+                        Text("Preview Voice")
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = { onSave(name, description) }, enabled = name.isNotBlank() && description.isNotBlank()) {
-                Text("保存")
+                Text("Save")
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
     )
 }
 
@@ -579,12 +579,12 @@ private suspend fun playAudio(wavData: ByteArray) = withContext(Dispatchers.IO) 
     val channelConfig = when (channelCount) {
         1 -> AudioFormat.CHANNEL_OUT_MONO
         2 -> AudioFormat.CHANNEL_OUT_STEREO
-        else -> throw IllegalArgumentException("不支持的 WAV 声道数: $channelCount")
+        else -> throw IllegalArgumentException("Unsupported WAV channel count: $channelCount")
     }
     val encoding = when (bitsPerSample) {
         8 -> AudioFormat.ENCODING_PCM_8BIT
         16 -> AudioFormat.ENCODING_PCM_16BIT
-        else -> throw IllegalArgumentException("不支持的 WAV 位深: $bitsPerSample")
+        else -> throw IllegalArgumentException("Unsupported WAV bit depth: $bitsPerSample")
     }
 
     val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, encoding)
@@ -679,17 +679,17 @@ private fun EditVoiceMetaDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("编辑音色信息") },
+        title = { Text("Edit Voice Info") },
         text = {
             Column {
                 Text(voice.name, style = MaterialTheme.typography.bodyMedium)
                 Spacer(Modifier.height(8.dp))
-                Text("性别", style = MaterialTheme.typography.labelMedium)
+                Text("Gender", style = MaterialTheme.typography.labelMedium)
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.padding(vertical = 4.dp)
                 ) {
-                    FilterChip(selected = gender == null, onClick = { gender = null }, label = { Text("未分类") })
+                    FilterChip(selected = gender == null, onClick = { gender = null }, label = { Text("Unclassified") })
                     com.voxengine.engine.VoiceGender.ALL.forEach { g ->
                         FilterChip(
                             selected = gender == g,
@@ -699,12 +699,12 @@ private fun EditVoiceMetaDialog(
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Text("年龄段", style = MaterialTheme.typography.labelMedium)
+                Text("Age group", style = MaterialTheme.typography.labelMedium)
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.padding(vertical = 4.dp)
                 ) {
-                    FilterChip(selected = ageGroup == null, onClick = { ageGroup = null }, label = { Text("未设置") })
+                    FilterChip(selected = ageGroup == null, onClick = { ageGroup = null }, label = { Text("Not set") })
                     com.voxengine.engine.VoiceAgeGroup.ALL.forEach { a ->
                         FilterChip(
                             selected = ageGroup == a,
@@ -717,8 +717,8 @@ private fun EditVoiceMetaDialog(
                 OutlinedTextField(
                     value = tagsText,
                     onValueChange = { tagsText = it },
-                    label = { Text("自定义标签") },
-                    placeholder = { Text("用逗号分隔，如：旁白,温柔") },
+                    label = { Text("Custom tags") },
+                    placeholder = { Text("Comma-separated, e.g. narrator,gentle") },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -726,8 +726,8 @@ private fun EditVoiceMetaDialog(
         confirmButton = {
             TextButton(onClick = {
                 onSave(gender, ageGroup, com.voxengine.engine.VoiceTags.parse(tagsText).let { com.voxengine.engine.VoiceTags.join(it) })
-            }) { Text("保存") }
+            }) { Text("Save") }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
     )
 }

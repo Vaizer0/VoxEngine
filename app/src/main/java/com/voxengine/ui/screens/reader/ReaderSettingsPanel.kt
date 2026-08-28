@@ -77,21 +77,21 @@ internal fun ReaderSettingsPanel(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("听书设置", style = MaterialTheme.typography.titleSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+            Text("Listen Settings", style = MaterialTheme.typography.titleSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
         }
         ExposedDropdownMenuBox(expanded = voiceExpanded, onExpandedChange = onVoiceExpandedChange) {
             OutlinedTextField(
                 value = selectedVoiceName,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("音色") },
+                label = { Text("Voice") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(voiceExpanded) },
                 modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
             )
             ExposedDropdownMenu(expanded = voiceExpanded, onDismissRequest = { onVoiceExpandedChange(false) }) {
                 voices.forEach { voice ->
                     DropdownMenuItem(
-                        text = { Text("${voice.name} - ${voice.description}") },
+                        text = { Text("${voice.uiName} - ${voice.description}") },
                         onClick = { onVoiceSelected(voice) }
                     )
                 }
@@ -100,16 +100,16 @@ internal fun ReaderSettingsPanel(
         OutlinedTextField(
             value = selectedStyle,
             onValueChange = onStyleChange,
-            label = { Text("风格") },
-            placeholder = { Text("如：温柔、粤语、四川话") },
+            label = { Text("Style") },
+            placeholder = { Text("e.g. gentle, Cantonese, Sichuan") },
             modifier = Modifier.fillMaxWidth()
         )
         // ---- 分角色朗读 ----
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("分角色朗读", style = MaterialTheme.typography.bodyMedium)
+                Text("Per-role reading", style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    "旁白与对话使用不同音色",
+                    "Use different voices for narration and dialogue",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -118,29 +118,29 @@ internal fun ReaderSettingsPanel(
         }
         if (roleEnabled) {
             RoleVoicePicker(
-                label = "旁白音色",
-                selectedName = roleProfile.narration.voice ?: "默认（同主音色）",
+                label = "Narration voice",
+                selectedName = roleProfile.narration.voice ?: "Default (same as main voice)",
                 voices = voices,
                 onSelected = onNarrationVoiceChange
             )
             OutlinedTextField(
                 value = roleProfile.narration.style ?: "",
                 onValueChange = onNarrationStyleChange,
-                label = { Text("旁白风格（可选）") },
-                placeholder = { Text("留空用默认风格") },
+                label = { Text("Narration style (optional)") },
+                placeholder = { Text("Leave empty to use default style") },
                 modifier = Modifier.fillMaxWidth()
             )
             RoleVoicePicker(
-                label = "对话音色",
-                selectedName = roleProfile.dialogue.voice ?: "默认（同主音色）",
+                label = "Dialogue voice",
+                selectedName = roleProfile.dialogue.voice ?: "Default (same as main voice)",
                 voices = voices,
                 onSelected = onDialogueVoiceChange
             )
             OutlinedTextField(
                 value = roleProfile.dialogue.style ?: "",
                 onValueChange = onDialogueStyleChange,
-                label = { Text("对话风格（可选）") },
-                placeholder = { Text("留空用默认风格") },
+                label = { Text("Dialogue style (optional)") },
+                placeholder = { Text("Leave empty to use default style") },
                 modifier = Modifier.fillMaxWidth()
             )
             CharacterVoiceEditor(
@@ -150,21 +150,21 @@ internal fun ReaderSettingsPanel(
                 onRemove = onCharacterRemove
             )
         }
-        Text("段间间隔: ${readerGapMs}ms", style = MaterialTheme.typography.bodySmall)
+        Text("Inter-paragraph gap: ${readerGapMs}ms", style = MaterialTheme.typography.bodySmall)
         Slider(
             value = readerGapMs.toFloat(),
             onValueChange = { onGapChange(it.roundToInt()) },
             onValueChangeFinished = onGapChangeFinished,
             valueRange = 0f..3000f
         )
-        Text("克隆/设计请求间隔: ${conservativeRequestIntervalMs}ms", style = MaterialTheme.typography.bodySmall)
+        Text("Clone/design request interval: ${conservativeRequestIntervalMs}ms", style = MaterialTheme.typography.bodySmall)
         Slider(
             value = conservativeRequestIntervalMs.toFloat(),
             onValueChange = { onConservativeRequestIntervalChange(it.roundToInt()) },
             onValueChangeFinished = onConservativeRequestIntervalChangeFinished,
             valueRange = 500f..30000f
         )
-        Text("失败重试次数: ${retryCount}次", style = MaterialTheme.typography.bodySmall)
+        Text("Failure retry count: ${retryCount}", style = MaterialTheme.typography.bodySmall)
         Slider(
             value = retryCount.toFloat(),
             onValueChange = { onRetryCountChange(it.roundToInt()) },
@@ -172,14 +172,14 @@ internal fun ReaderSettingsPanel(
             valueRange = 0f..8f,
             steps = 7
         )
-        Text("重试基础等待: ${retryBaseDelayMs}ms", style = MaterialTheme.typography.bodySmall)
+        Text("Retry base delay: ${retryBaseDelayMs}ms", style = MaterialTheme.typography.bodySmall)
         Slider(
             value = retryBaseDelayMs.toFloat(),
             onValueChange = { onRetryBaseDelayChange(it.roundToInt()) },
             onValueChangeFinished = onRetryBaseDelayChangeFinished,
             valueRange = 500f..15000f
         )
-        Text("定时停止: " + if (readerSleepMinutes == 0) "关闭" else "${readerSleepMinutes}分钟", style = MaterialTheme.typography.bodySmall)
+        Text("Scheduled stop: " + if (readerSleepMinutes == 0) "Off" else "${readerSleepMinutes} minutes", style = MaterialTheme.typography.bodySmall)
         Slider(
             value = readerSleepMinutes.toFloat(),
             onValueChange = { onSleepChange(it.roundToInt()) },
@@ -187,7 +187,7 @@ internal fun ReaderSettingsPanel(
             valueRange = 0f..180f,
             steps = 17
         )
-        Text("播放章数后停止: " + if (readerStopAfterChapters == 0) "关闭" else "${readerStopAfterChapters}章", style = MaterialTheme.typography.bodySmall)
+        Text("Stop after playing chapters: " + if (readerStopAfterChapters == 0) "Off" else "${readerStopAfterChapters} chapters", style = MaterialTheme.typography.bodySmall)
         Slider(
             value = readerStopAfterChapters.toFloat(),
             onValueChange = { onStopAfterChaptersChange(it.roundToInt()) },

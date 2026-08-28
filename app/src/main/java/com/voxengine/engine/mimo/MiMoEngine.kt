@@ -31,7 +31,7 @@ class MiMoEngine(
 
     override val id = "mimo"
     override val name = "MiMo TTS"
-    override val description = "小米 MiMo 语音合成引擎"
+    override val description = "Xiaomi MiMo speech synthesis engine"
     override val supportsVoiceClone = true
     override val supportsVoiceDesign = true
 
@@ -50,7 +50,7 @@ class MiMoEngine(
     private suspend fun getClient(): MiMoTTSClient {
         client?.let { return it }
         val config = settingsRepository.getMiMoClientConfig()
-        if (config.apiKey.isBlank()) throw IllegalStateException("MiMo API Key 未配置")
+        if (config.apiKey.isBlank()) throw IllegalStateException("MiMo API Key not configured")
 
         clientConfigMutex.withLock {
             val existing = client
@@ -277,7 +277,8 @@ class MiMoEngine(
                 type = VoiceType.PRESET,
                 engineId = id,
                 gender = meta?.first,
-                ageGroup = meta?.second
+                ageGroup = meta?.second,
+                displayName = MIMO_DISPLAY_NAMES[it.name]
             )
         }
 
@@ -292,7 +293,7 @@ class MiMoEngine(
             EngineVoiceInfo(
                 id = item.name,
                 name = item.name,
-                description = item.description.ifEmpty { if (type == VoiceType.CLONE) "克隆音色" else "设计音色" },
+                description = item.description.ifEmpty { if (type == VoiceType.CLONE) "Clone voice" else "Designed voice" },
                 type = type,
                 engineId = id,
                 gender = item.gender,
@@ -306,21 +307,21 @@ class MiMoEngine(
 
     override suspend fun getStyles(): List<String> {
         return listOf(
-            "无",
-            // 基础情绪
-            "开心", "悲伤", "生气", "恐惧", "惊讶", "兴奋", "委屈", "平静", "冷漠",
-            // 复合情绪
-            "怅然", "欣慰", "无奈", "愧疚", "释然", "动情",
-            // 整体语调
-            "温柔", "高冷", "活泼", "严肃", "慵懒", "俏皮", "深沉", "干练",
-            // 音色定位
-            "磁性", "醇厚", "清亮", "空灵", "甜美", "沙哑",
-            // 人设腔调
-            "夹子音", "御姐音", "正太音", "大叔音", "台湾腔",
-            // 方言
-            "粤语", "四川话",
-            // 其他
-            "悄悄话", "唱歌"
+            "None",
+            // Basic emotions
+            "Happy", "Sad", "Angry", "Fearful", "Surprised", "Excited", "Hurt", "Calm", "Cold",
+            // Compound emotions
+            "Melancholy", "Gratified", "Helpless", "Guilty", "Relieved", "Moved",
+            // Overall tone
+            "Gentle", "Aloof", "Lively", "Serious", "Languid", "Playful", "Deep", "Capable",
+            // Voice character
+            "Magnetic", "Mellow", "Bright", "Ethereal", "Sweet", "Hoarse",
+            // Character tones
+            "Baby-voice", "Elegant-lady", "Boyish", "Uncle", "Taiwan-accent",
+            // Dialects
+            "Cantonese", "Sichuan-dialect",
+            // Other
+            "Whisper", "Singing"
         )
     }
 
@@ -350,7 +351,7 @@ class MiMoEngine(
             type = "clone",
             model = MiMoTTSClient.MODEL_CLONE,
             voiceParam = voiceParam,
-            description = "克隆音色",
+            description = "Clone voice",
             engineId = id
         )
         db.voiceDao().insert(voiceEntity)
@@ -359,7 +360,7 @@ class MiMoEngine(
         return EngineVoiceInfo(
             id = "clone_$name",
             name = name,
-            description = "克隆音色",
+            description = "Clone voice",
             type = VoiceType.CLONE,
             engineId = id
         )
@@ -395,5 +396,13 @@ class MiMoEngine(
         private const val TAG = "MiMoEngine"
         private const val DEFAULT_STREAMING_RETRY_COUNT = 3
         private const val DEFAULT_STREAMING_RETRY_BASE_DELAY_MS = 1500L
+
+        /** Romanized display names for MiMo preset voices (keyed by voice name/id). */
+        val MIMO_DISPLAY_NAMES: Map<String, String> = mapOf(
+            "冰糖" to "Bingtang",
+            "茉莉" to "Moli",
+            "苏打" to "Soda",
+            "白桦" to "Birch"
+        )
     }
 }

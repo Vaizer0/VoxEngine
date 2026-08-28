@@ -44,6 +44,6 @@ object RetryPolicy {
                 attempt += 1
             }
         }
-        throw lastError ?: IllegalStateException("重试失败")
+        throw lastError ?: IllegalStateException("Retry failed")
     }
 }

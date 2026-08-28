@@ -101,7 +101,7 @@ internal fun ReaderPage(
             val pageInfoGapPx = 14.dp.roundToPx()
             val paragraphGapPx = 14.dp.roundToPx()
             val pageInfoHeightPx = textMeasurer.measure(
-                text = AnnotatedString("第999/999章 · 第999/999页"),
+                text = AnnotatedString("Chapter 999/999 · Page 999/999"),
                 style = pageInfoStyle,
                 constraints = Constraints(maxWidth = pageWidthPx)
             ).size.height
@@ -207,7 +207,7 @@ internal fun ReaderPage(
                         Spacer(Modifier.height(8.dp))
                     }
                     Text(
-                        "第${frame.chapterIndex + 1}/${frame.chapterCount}章 · 第${frame.pageIndex + 1}/${frame.pageCount}页",
+                        "Chapter ${frame.chapterIndex + 1}/${frame.chapterCount} · Page ${frame.pageIndex + 1}/${frame.pageCount}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -236,12 +236,12 @@ internal fun ReaderPage(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     TextButton(onClick = { onCopyParagraph(paragraph) }) {
-                                        Text("复制")
+                                        Text("Copy")
                                     }
                                     Button(onClick = { onReadFromParagraph(index) }) {
                                         Icon(Icons.Default.PlayArrow, contentDescription = null)
                                         Spacer(Modifier.width(6.dp))
-                                        Text("从此段开始读")
+                                        Text("Read from here")
                                     }
                                 }
                             }

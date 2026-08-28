@@ -89,9 +89,9 @@ fun TestScreen() {
     val historyFlow = remember(db) { db.synthesisHistoryDao().getRecent(10) }
     val history by historyFlow.collectAsState(initial = emptyList())
 
-    var text by remember { mutableStateOf("你好，欢迎使用 VoxEngine 语音合成引擎！") }
+    var text by remember { mutableStateOf("Hello, welcome to the VoxEngine speech synthesis engine!") }
     var selectedVoiceId by remember { mutableStateOf("冰糖") }
-    var selectedVoiceName by remember { mutableStateOf("冰糖") }
+    var selectedVoiceName by remember { mutableStateOf("Bingtang") }
     var selectedStyle by remember { mutableStateOf("") }
     var isSynthesizing by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
@@ -140,11 +140,11 @@ fun TestScreen() {
         isPlaying = false
         isPaused = false
         isSynthesizing = false
-        statusText = "已停止"
+        statusText = "Stopped"
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("TTS 测试 - ${activeEngine?.name ?: currentEngineId}") }) }
+        topBar = { TopAppBar(title = { Text("TTS Test - ${activeEngine?.name ?: currentEngineId}") }) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -164,13 +164,13 @@ fun TestScreen() {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "⚠️ 当前引擎未配置",
+                        "⚠️ Current engine not configured",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "请先在设置页面完成当前引擎配置，否则无法合成语音。",
+                        "Please configure the current engine on the Settings page first, otherwise speech cannot be synthesized.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
@@ -181,7 +181,7 @@ fun TestScreen() {
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
-            label = { Text("输入文本") },
+            label = { Text("Input text") },
             modifier = Modifier.fillMaxWidth().height(120.dp)
         )
         Spacer(Modifier.height(12.dp))
@@ -197,17 +197,17 @@ fun TestScreen() {
                     value = selectedVoiceName,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("音色") },
+                    label = { Text("Voice") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 )
                 ExposedDropdownMenu(expanded = voiceExpanded, onDismissRequest = { voiceExpanded = false }) {
                     voices.forEach { voice ->
                         DropdownMenuItem(
-                            text = { Text("${voice.name} - ${voice.description}") },
+                            text = { Text("${voice.uiName} - ${voice.description}") },
                             onClick = {
                                 selectedVoiceId = voice.id
-                                selectedVoiceName = voice.name
+                                selectedVoiceName = voice.uiName
                                 voiceExpanded = false
                             }
                         )
@@ -219,8 +219,8 @@ fun TestScreen() {
             OutlinedTextField(
                 value = selectedStyle,
                 onValueChange = { selectedStyle = it },
-                label = { Text("风格（可自定义）") },
-                placeholder = { Text("如：温柔磁性、东北话") },
+                label = { Text("Style (customizable)") },
+                placeholder = { Text("e.g. Gentle, North-East accent") },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -231,7 +231,7 @@ fun TestScreen() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf("四川话", "粤语").forEach { dialect ->
+            listOf("Sichuan", "Cantonese").forEach { dialect ->
                 OutlinedButton(onClick = { selectedStyle = dialect }) {
                     Text(dialect, style = MaterialTheme.typography.bodySmall)
                 }
@@ -239,7 +239,7 @@ fun TestScreen() {
             // 清除风格按钮
             if (selectedStyle.isNotBlank()) {
                 TextButton(onClick = { selectedStyle = "" }) {
-                    Text("清除", style = MaterialTheme.typography.bodySmall)
+                    Text("Clear", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -247,9 +247,9 @@ fun TestScreen() {
         Spacer(Modifier.height(16.dp))
 
         // 当前配置摘要
-        val currentStyle = selectedStyle.ifBlank { "无" }
+        val currentStyle = selectedStyle.ifBlank { "None" }
         Text(
-            "当前: $selectedVoiceName | 风格: $currentStyle",
+            "Current: $selectedVoiceName | Style: $currentStyle",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -261,17 +261,17 @@ fun TestScreen() {
                 onClick = {
                     scope.launch {
                         isSynthesizing = true
-                        statusText = "合成中..."
+                        statusText = "Synthesizing..."
                         elapsedMs = 0
                         try {
-                            val engine = activeEngine ?: throw IllegalStateException("未选择引擎")
-                            val styleParam = selectedStyle.ifBlank { null }?.takeIf { it != "无" }
+                            val engine = activeEngine ?: throw IllegalStateException("No engine selected")
+                            val styleParam = selectedStyle.ifBlank { null }?.takeIf { it != "None" }
                             val result = withContext(Dispatchers.IO) {
                                 engine.synthesize(text, selectedVoiceId, styleParam)
                             }
                             elapsedMs = result.elapsedMs
                             isSynthesizing = false
-                            statusText = "合成完成 (${elapsedMs}ms)，播放中..."
+                            statusText = "Synthesis complete (${elapsedMs}ms), playing..."
                             isPlaying = true
                             isPaused = false
 
@@ -279,7 +279,7 @@ fun TestScreen() {
                                 SynthesisHistoryEntity(
                                     text = text,
                                     voice = selectedVoiceId,
-                                    style = selectedStyle.ifBlank { "无" },
+                                    style = selectedStyle.ifBlank { "None" },
                                     speed = speed,
                                     engineId = currentEngineId
                                 )
@@ -291,9 +291,9 @@ fun TestScreen() {
                                 }
                             }
                             playJob?.join()
-                            if (isPlaying) statusText = "播放完成"
+                            if (isPlaying) statusText = "Playback finished"
                         } catch (e: Exception) {
-                            statusText = "错误: ${com.voxengine.util.TtsErrors.friendly(e)}"
+                            statusText = "Error: ${com.voxengine.util.TtsErrors.friendly(e)}"
                         } finally {
                             currentTrack = null
                             isSynthesizing = false
@@ -308,7 +308,7 @@ fun TestScreen() {
                 if (isSynthesizing) {
                     CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
                 }
-                Text(if (isSynthesizing) "合成中..." else "合成并播放")
+                Text(if (isSynthesizing) "Synthesizing..." else "Synthesize & Play")
             }
 
             // 暂停/继续按钮
@@ -319,16 +319,16 @@ fun TestScreen() {
                             if (isPaused) {
                                 track.play()
                                 isPaused = false
-                                statusText = "播放中..."
+                                statusText = "Playing..."
                             } else {
                                 track.pause()
                                 isPaused = true
-                                statusText = "已暂停"
+                                statusText = "Paused"
                             }
                         }
                     }
                 ) {
-                    Text(if (isPaused) "继续" else "暂停")
+                    Text(if (isPaused) "Resume" else "Pause")
                 }
             }
 
@@ -340,7 +340,7 @@ fun TestScreen() {
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("停止")
+                    Text("Stop")
                 }
             }
         }
@@ -350,9 +350,9 @@ fun TestScreen() {
         if (statusText.isNotEmpty()) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("状态: $statusText")
+                    Text("Status: $statusText")
                     if (elapsedMs > 0) {
-                        Text("耗时: ${elapsedMs}ms")
+                        Text("Time: ${elapsedMs}ms")
                     }
                 }
             }
@@ -366,24 +366,24 @@ fun TestScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("最近记录", style = MaterialTheme.typography.titleMedium)
+                Text("Recent History", style = MaterialTheme.typography.titleMedium)
                 TextButton(onClick = {
                     scope.launch { db.synthesisHistoryDao().deleteAll() }
                 }) {
-                    Text("清除全部")
+                    Text("Clear All")
                 }
             }
             Spacer(Modifier.height(8.dp))
             
             history.forEach { record ->
-                val voiceDisplayName = voices.find { it.id == record.voice }?.name ?: record.voice
+                val voiceDisplayName = voices.find { it.id == record.voice }?.uiName ?: record.voice
                 
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable {
                         text = record.text
                         selectedVoiceId = record.voice
                         selectedVoiceName = voiceDisplayName
-                        selectedStyle = record.style?.takeIf { it != "无" } ?: ""
+                        selectedStyle = record.style?.takeIf { it != "None" } ?: ""
                     }
                 ) {
                     Row(
@@ -397,7 +397,7 @@ fun TestScreen() {
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                "$voiceDisplayName | ${record.style ?: "无"}",
+                                "$voiceDisplayName | ${record.style ?: "None"}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -410,7 +410,7 @@ fun TestScreen() {
                         IconButton(onClick = {
                             scope.launch { db.synthesisHistoryDao().deleteById(record.id) }
                         }) {
-                            Icon(Icons.Default.Delete, "删除", modifier = Modifier.padding(4.dp))
+                            Icon(Icons.Default.Delete, "Delete", modifier = Modifier.padding(4.dp))
                         }
                     }
                 }
@@ -437,12 +437,12 @@ private suspend fun playAudioWithControl(
     val channelConfig = when (channelCount) {
         1 -> AudioFormat.CHANNEL_OUT_MONO
         2 -> AudioFormat.CHANNEL_OUT_STEREO
-        else -> throw IllegalArgumentException("不支持的 WAV 声道数: $channelCount")
+        else -> throw IllegalArgumentException("Unsupported WAV channel count: $channelCount")
     }
     val encoding = when (bitsPerSample) {
         8 -> AudioFormat.ENCODING_PCM_8BIT
         16 -> AudioFormat.ENCODING_PCM_16BIT
-        else -> throw IllegalArgumentException("不支持的 WAV 位深: $bitsPerSample")
+        else -> throw IllegalArgumentException("Unsupported WAV bit depth: $bitsPerSample")
     }
 
     val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, encoding)

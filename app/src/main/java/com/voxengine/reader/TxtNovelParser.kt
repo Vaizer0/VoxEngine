@@ -120,7 +120,7 @@ object TxtNovelParser {
     private fun buildChaptersFromHeadings(text: String, headings: List<Heading>): List<TxtChapter> {
         val chapters = mutableListOf<TxtChapter>()
         if (headings.first().start > 100) {
-            chapters += TxtChapter("前言", text.substring(0, headings.first().start).trim())
+            chapters += TxtChapter("Preface", text.substring(0, headings.first().start).trim())
         }
 
         headings.forEachIndexed { index, heading ->
@@ -146,7 +146,7 @@ object TxtNovelParser {
             }
             val content = text.substring(start, end).trim()
             if (content.isNotBlank()) {
-                chapters += TxtChapter("第${index}章", content)
+                chapters += TxtChapter("Chapter $index", content)
                 index += 1
             }
             start = end

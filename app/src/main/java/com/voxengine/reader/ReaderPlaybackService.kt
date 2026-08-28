@@ -116,7 +116,7 @@ class ReaderPlaybackService : Service() {
         val roleProfile = RoleProfileJson.parse(intent.getStringExtra(EXTRA_ROLE_PROFILE_JSON))
         state = PlaybackState(
             uri = uri,
-            title = intent.getStringExtra(EXTRA_TITLE) ?: "本地小说",
+            title = intent.getStringExtra(EXTRA_TITLE) ?: "Local novel",
             voice = intent.getStringExtra(EXTRA_VOICE) ?: "冰糖",
             style = intent.getStringExtra(EXTRA_STYLE)?.ifBlank { null },
             engineId = intent.getStringExtra(EXTRA_ENGINE_ID) ?: "mimo",
@@ -145,10 +145,10 @@ class ReaderPlaybackService : Service() {
         isPaused = false
         lastProgressPersistAt = 0L
         fallbackPagesByChapter.clear()
-        startForeground(NOTIFICATION_ID, buildNotification("准备播放", isPlaying = true))
+        startForeground(NOTIFICATION_ID, buildNotification("Preparing to play", isPlaying = true))
         playbackJob = serviceScope.launch { runPlayback() }
         publishPlaybackState(true)
-        updateMediaMetadata(state?.title ?: "VoxEngine 听书")
+        updateMediaMetadata(state?.title ?: "VoxEngine Listening")
         updateMediaPlaybackState()
     }
 
@@ -159,7 +159,7 @@ class ReaderPlaybackService : Service() {
             throw e
         } catch (e: Exception) {
             LogManager.appendLog("E", TAG, "Reader playback failed: ${e.message}")
-            updateNotification("听书失败: ${com.voxengine.util.TtsErrors.friendly(e)}", false)
+            updateNotification("Listening failed: ${com.voxengine.util.TtsErrors.friendly(e)}", false)
             finishPlayback()
         }
     }
@@ -171,7 +171,7 @@ class ReaderPlaybackService : Service() {
         }
         val engine = EngineRegistry.get(playbackState.engineId)
         if (engine == null) {
-            updateNotification("未找到引擎 ${playbackState.engineId}", false)
+            updateNotification("Engine not found: ${playbackState.engineId}", false)
             finishPlayback()
             return
         }
@@ -199,7 +199,7 @@ class ReaderPlaybackService : Service() {
                 }
         }
         if (chapters.isEmpty()) {
-            updateNotification("没有可播放章节", false)
+            updateNotification("No playable chapters", false)
             finishPlayback()
             return
         }
@@ -233,7 +233,7 @@ class ReaderPlaybackService : Service() {
                 val pages = pagesForPlayback(chapters, pos.chapterIndex, playbackState)
                 if (pages.getOrNull(pos.pageIndex) == null) break
                 val startParagraphIndex = if (pos == startPosition) playbackState.paragraphIndex else 0
-                updateNotification("${chapter.title} · 第${pos.pageIndex + 1}页 合成中", true)
+                updateNotification("${chapter.title} · Page ${pos.pageIndex + 1} synthesizing", true)
 
                 val nextPosition = nextPosition(chapters, pos)
                 val nextChapterPrefetchPageCount = nextChapterPrefetchPagesByChapter[pos.chapterIndex] ?: 0
@@ -258,7 +258,7 @@ class ReaderPlaybackService : Service() {
                     continue
                 }
 
-                updateNotification("${chapter.title} · 第${pos.pageIndex + 1}页", true)
+                updateNotification("${chapter.title} · Page ${pos.pageIndex + 1}", true)
                 var pageFailed = false
                 var lastProgressParagraphIndex = -1
                 for (index in currentChunks.indices) {
@@ -279,7 +279,7 @@ class ReaderPlaybackService : Service() {
                         } else {
                             LogManager.appendLog("W", TAG, "Paragraph " + key.paragraphIndex + "." + key.chunkIndex + " prefetch missing, synthesizing inline")
                         }
-                        updateNotification(chapter.title + " · 第" + (pos.pageIndex + 1) + "页 补合成中", true)
+                        updateNotification(chapter.title + " · Page " + (pos.pageIndex + 1) + " extra synthesizing", true)
                         chunk = try {
                             synthesizeParagraph(
                                 engine,
@@ -311,7 +311,7 @@ class ReaderPlaybackService : Service() {
                     runCatching { playAudioChunk(chunk.audioData) }
                         .onFailure { error ->
                             LogManager.appendLog("E", TAG, "Audio playback failed: ${error.message}")
-                            updateNotification("音频播放失败: ${com.voxengine.util.TtsErrors.friendly(error)}", false)
+                            updateNotification("Audio playback failed: ${com.voxengine.util.TtsErrors.friendly(error)}", false)
                             pageFailed = true
                             playbackFailed = true
                         }
@@ -348,7 +348,7 @@ class ReaderPlaybackService : Service() {
         }
 
         if (!playbackFailed) {
-            updateNotification("听书已结束", false)
+            updateNotification("Listening ended", false)
         }
         finishPlayback()
     }
@@ -596,16 +596,16 @@ class ReaderPlaybackService : Service() {
         val channelCount = wav.channelCount
         val bitsPerSample = wav.bitsPerSample
         val pcmData = wav.pcmData
-        if (pcmData.isEmpty()) throw IllegalArgumentException("音频数据为空")
+        if (pcmData.isEmpty()) throw IllegalArgumentException("Audio data is empty")
         val channelConfig = when (channelCount) {
             1 -> AudioFormat.CHANNEL_OUT_MONO
             2 -> AudioFormat.CHANNEL_OUT_STEREO
-            else -> throw IllegalArgumentException("不支持的 WAV 声道数: $channelCount")
+            else -> throw IllegalArgumentException("Unsupported WAV channel count: $channelCount")
         }
         val encoding = when (bitsPerSample) {
             8 -> AudioFormat.ENCODING_PCM_8BIT
             16 -> AudioFormat.ENCODING_PCM_16BIT
-            else -> throw IllegalArgumentException("不支持的 WAV 位深: $bitsPerSample")
+            else -> throw IllegalArgumentException("Unsupported WAV bit depth: $bitsPerSample")
         }
         val bytesPerFrame = channelCount * (bitsPerSample / 8).coerceAtLeast(1)
         val frameCount = if (bytesPerFrame > 0) pcmData.size / bytesPerFrame else pcmData.size
@@ -747,7 +747,7 @@ class ReaderPlaybackService : Service() {
         if (state == null || playbackJob == null) return
         isPaused = true
         currentTrack?.let { track -> runCatching { track.pause() } }
-        updateNotification("已暂停", false)
+        updateNotification("Paused", false)
         publishPlaybackState(true)
         updateMediaPlaybackState()
     }
@@ -756,7 +756,7 @@ class ReaderPlaybackService : Service() {
         if (state == null || playbackJob == null) return
         isPaused = false
         currentTrack?.let { track -> runCatching { track.play() } }
-        updateNotification("播放中", true)
+        updateNotification("Playing", true)
         publishPlaybackState(true)
         updateMediaPlaybackState()
     }
@@ -854,12 +854,12 @@ class ReaderPlaybackService : Service() {
     private fun buildNotification(text: String, isPlaying: Boolean): Notification {
         val playPauseAction = mediaAction(
             if (isPaused) android.R.drawable.ic_media_play else android.R.drawable.ic_media_pause,
-            if (isPaused) "继续" else "暂停",
+            if (isPaused) "Resume" else "Pause",
             serviceIntent(if (isPaused) ACTION_RESUME else ACTION_PAUSE, 1)
         )
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(state?.title ?: "VoxEngine 听书")
+            .setContentTitle(state?.title ?: "VoxEngine Listening")
             .setContentText(text)
             .setOngoing(isPlaying)
             .setContentIntent(
@@ -871,9 +871,9 @@ class ReaderPlaybackService : Service() {
                 )
             )
             .addAction(playPauseAction)
-            .addAction(mediaAction(android.R.drawable.ic_media_previous, "上一章", serviceIntent(ACTION_PREVIOUS_CHAPTER, 2)))
-            .addAction(mediaAction(android.R.drawable.ic_media_next, "下一章", serviceIntent(ACTION_NEXT_CHAPTER, 3)))
-            .addAction(mediaAction(android.R.drawable.ic_menu_close_clear_cancel, "停止", serviceIntent(ACTION_STOP, 4)))
+            .addAction(mediaAction(android.R.drawable.ic_media_previous, "Previous chapter", serviceIntent(ACTION_PREVIOUS_CHAPTER, 2)))
+            .addAction(mediaAction(android.R.drawable.ic_media_next, "Next chapter", serviceIntent(ACTION_NEXT_CHAPTER, 3)))
+            .addAction(mediaAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", serviceIntent(ACTION_STOP, 4)))
             .setStyle(
                 Notification.MediaStyle()
                     .setMediaSession(mediaSession?.sessionToken)

@@ -164,12 +164,12 @@ class VoiceManageViewModel(app: Application) : AndroidViewModel(app) {
         val channelConfig = when (channelCount) {
             1 -> android.media.AudioFormat.CHANNEL_OUT_MONO
             2 -> android.media.AudioFormat.CHANNEL_OUT_STEREO
-            else -> throw IllegalArgumentException("不支持的 WAV 声道数: $channelCount")
+            else -> throw IllegalArgumentException("Unsupported WAV channel count: $channelCount")
         }
         val encoding = when (bitsPerSample) {
             8 -> android.media.AudioFormat.ENCODING_PCM_8BIT
             16 -> android.media.AudioFormat.ENCODING_PCM_16BIT
-            else -> throw IllegalArgumentException("不支持的 WAV 位深: $bitsPerSample")
+            else -> throw IllegalArgumentException("Unsupported WAV bit depth: $bitsPerSample")
         }
 
         val bufferSize = android.media.AudioTrack.getMinBufferSize(sampleRate, channelConfig, encoding)

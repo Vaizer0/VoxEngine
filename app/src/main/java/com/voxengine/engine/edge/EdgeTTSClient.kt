@@ -147,7 +147,7 @@ class EdgeTTSClient {
         try {
             if (!latch.await(30, TimeUnit.SECONDS)) {
                 ws.cancel()
-                throw java.io.IOException("Edge TTS 合成超时")
+                throw java.io.IOException("Edge TTS synthesis timed out")
             }
         } finally {
             ws.cancel()

@@ -18,7 +18,7 @@ class EdgeTTSEngine(
 
     override val id = "edge"
     override val name = "Edge TTS"
-    override val description = "微软 Edge TTS 引擎（免费）"
+    override val description = "Free Microsoft Edge TTS engine"
     override val supportsVoiceClone = false
     override val supportsVoiceDesign = false
 
@@ -72,32 +72,34 @@ class EdgeTTSEngine(
 
     override suspend fun getVoices(): List<VoiceInfo> {
         return listOf(
-            VoiceInfo("zh-CN-XiaoxiaoNeural", "晓晓", "中文女声", VoiceType.PRESET, id),
-            VoiceInfo("zh-CN-YunxiNeural", "云希", "中文男声", VoiceType.PRESET, id),
-            VoiceInfo("zh-CN-YunjianNeural", "云健", "中文男声", VoiceType.PRESET, id),
-            VoiceInfo("zh-CN-XiaoyiNeural", "晓伊", "中文女声", VoiceType.PRESET, id),
-            VoiceInfo("zh-CN-YunyangNeural", "云扬", "中文男声(新闻)", VoiceType.PRESET, id),
-            VoiceInfo("zh-CN-liaoning-XiaobeiNeural", "晓北", "东北话女声", VoiceType.PRESET, id),
-            VoiceInfo("zh-CN-shaanxi-XiaoniNeural", "晓妮", "陕西话女声", VoiceType.PRESET, id),
-            VoiceInfo("zh-HK-HiuMaanNeural", "曉曼", "粤语女声", VoiceType.PRESET, id),
-            VoiceInfo("zh-TW-HsiaoChenNeural", "曉臻", "台湾女声", VoiceType.PRESET, id),
-            VoiceInfo("en-US-JennyNeural", "Jenny", "英文女声", VoiceType.PRESET, id),
-            VoiceInfo("en-US-GuyNeural", "Guy", "英文男声", VoiceType.PRESET, id),
-            VoiceInfo("en-US-AriaNeural", "Aria", "英文女声", VoiceType.PRESET, id),
-            // 日语音色（MiMo 不支持日语，会把日文汉字按中文读；日语请使用以下 Edge 音色）
-            VoiceInfo("ja-JP-NanamiNeural", "七海", "日语女声", VoiceType.PRESET, id),
-            VoiceInfo("ja-JP-KeitaNeural", "圭太", "日语男声", VoiceType.PRESET, id),
-            VoiceInfo("ja-JP-AoiNeural", "葵", "日语女声", VoiceType.PRESET, id),
-            VoiceInfo("ja-JP-DaichiNeural", "大智", "日语男声", VoiceType.PRESET, id),
-            VoiceInfo("ja-JP-ShioriNeural", "诗织", "日语女声", VoiceType.PRESET, id),
-            VoiceInfo("ja-JP-NaokiNeural", "直树", "日语男声", VoiceType.PRESET, id),
-            VoiceInfo("ja-JP-MayuNeural", "真由", "日语女声", VoiceType.PRESET, id)
+            VoiceInfo("zh-CN-XiaoxiaoNeural", "晓晓", "Chinese female", VoiceType.PRESET, id, displayName = "Xiaoxiao"),
+            VoiceInfo("zh-CN-YunxiNeural", "云希", "Chinese male", VoiceType.PRESET, id, displayName = "Yunxi"),
+            VoiceInfo("zh-CN-YunjianNeural", "云健", "Chinese male", VoiceType.PRESET, id, displayName = "Yunjian"),
+            VoiceInfo("zh-CN-XiaoyiNeural", "晓伊", "Chinese female", VoiceType.PRESET, id, displayName = "Xiaoyi"),
+            VoiceInfo("zh-CN-YunyangNeural", "云扬", "Chinese male (news)", VoiceType.PRESET, id, displayName = "Yunyang"),
+            VoiceInfo("zh-CN-liaoning-XiaobeiNeural", "晓北", "Chinese female (Northeast dialect)", VoiceType.PRESET, id, displayName = "Xiaobei"),
+            VoiceInfo("zh-CN-shaanxi-XiaoniNeural", "晓妮", "Chinese female (Shaanxi dialect)", VoiceType.PRESET, id, displayName = "Xiaoni"),
+            VoiceInfo("zh-HK-HiuMaanNeural", "曉曼", "Cantonese female", VoiceType.PRESET, id, displayName = "HiuMaan"),
+            VoiceInfo("zh-TW-HsiaoChenNeural", "曉臻", "Taiwanese female", VoiceType.PRESET, id, displayName = "HsiaoChen"),
+            VoiceInfo("en-US-JennyNeural", "Jenny", "English female", VoiceType.PRESET, id),
+            VoiceInfo("en-US-GuyNeural", "Guy", "English male", VoiceType.PRESET, id),
+            VoiceInfo("en-US-AriaNeural", "Aria", "English female", VoiceType.PRESET, id),
+            VoiceInfo("en-US-AndrewNeural", "Andrew", "English male", VoiceType.PRESET, id),
+            VoiceInfo("en-US-AndrewMultilingualNeural", "Andrew (multilingual)", "English male (multilingual)", VoiceType.PRESET, id),
+            // Japanese voices (MiMo doesn't support Japanese, it reads Kanji as Chinese; use these Edge voices for Japanese)
+            VoiceInfo("ja-JP-NanamiNeural", "七海", "Japanese female", VoiceType.PRESET, id, displayName = "Nanami"),
+            VoiceInfo("ja-JP-KeitaNeural", "圭太", "Japanese male", VoiceType.PRESET, id, displayName = "Keita"),
+            VoiceInfo("ja-JP-AoiNeural", "葵", "Japanese female", VoiceType.PRESET, id, displayName = "Aoi"),
+            VoiceInfo("ja-JP-DaichiNeural", "大智", "Japanese male", VoiceType.PRESET, id, displayName = "Daichi"),
+            VoiceInfo("ja-JP-ShioriNeural", "诗织", "Japanese female", VoiceType.PRESET, id, displayName = "Shiori"),
+            VoiceInfo("ja-JP-NaokiNeural", "直树", "Japanese male", VoiceType.PRESET, id, displayName = "Naoki"),
+            VoiceInfo("ja-JP-MayuNeural", "真由", "Japanese female", VoiceType.PRESET, id, displayName = "Mayu")
         )
     }
 
     override suspend fun getStyles(): List<String> = emptyList()
 
-    /** 设置页存 voice.name、Reader 存 voice.id，统一解析回 Edge 需要的完整 voice id。 */
+    /** Settings page saves voice.name, Reader saves voice.id; resolve both back to the full Edge voice id. */
     private suspend fun resolveVoiceId(voice: String): String {
         if (voice.contains("Neural")) return voice
         val match = getVoices().firstOrNull { it.name == voice || it.id == voice }
@@ -107,10 +109,10 @@ class EdgeTTSEngine(
     override fun isConfigured(): Boolean = true
 
     override suspend fun cloneVoice(name: String, referenceAudio: ByteArray): VoiceInfo {
-        throw NotImplementedError("Edge TTS 不支持音色克隆")
+        throw NotImplementedError("Edge TTS does not support voice cloning")
     }
 
     override suspend fun designVoice(description: String): VoiceInfo {
-        throw NotImplementedError("Edge TTS 不支持音色设计")
+        throw NotImplementedError("Edge TTS does not support voice design")
     }
 }

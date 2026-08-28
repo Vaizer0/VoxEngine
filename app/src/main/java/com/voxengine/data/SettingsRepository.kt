@@ -26,7 +26,7 @@ class SettingsRepository(private val context: Context) {
     val baseUrl: Flow<String> = context.dataStore.data.map { it[KEY_BASE_URL] ?: "https://api.xiaomimimo.com" }
     val apiKey: Flow<String> = context.dataStore.data.map { it[KEY_API_KEY] ?: "" }
     val defaultVoice: Flow<String> = context.dataStore.data.map { it[KEY_DEFAULT_VOICE] ?: "冰糖" }
-    val defaultStyle: Flow<String> = context.dataStore.data.map { it[KEY_DEFAULT_STYLE] ?: "无" }
+    val defaultStyle: Flow<String> = context.dataStore.data.map { it[KEY_DEFAULT_STYLE] ?: "None" }
     val defaultTemperature: Flow<Float> = context.dataStore.data.map { it[KEY_DEFAULT_TEMPERATURE] ?: 0.6f }
     val speed: Flow<Float> = context.dataStore.data.map { it[KEY_SPEED] ?: 1.0f }
     val darkMode: Flow<Boolean> = context.dataStore.data.map { it[KEY_DARK_MODE] ?: false }

@@ -8,5 +8,8 @@ data class VoiceInfo(
     val engineId: String = "",
     val gender: String? = null,
     val ageGroup: String? = null,
-    val tags: List<String> = emptyList()
-)
+    val tags: List<String> = emptyList(),
+    val displayName: String? = null
+) {
+    val uiName: String get() = displayName ?: name
+}

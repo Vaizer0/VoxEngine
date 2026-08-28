@@ -52,9 +52,9 @@ internal fun Bookshelf(
                 ) {
                     Icon(Icons.Default.UploadFile, contentDescription = null, modifier = Modifier.size(34.dp))
                     Spacer(Modifier.height(10.dp))
-                    Text("导入小说", style = MaterialTheme.typography.titleSmall)
-                    Text("支持 TXT / EPUB", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("可一次选择多本", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Import novel", style = MaterialTheme.typography.titleSmall)
+                    Text("Supports TXT / EPUB", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Select multiple at once", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -71,11 +71,11 @@ internal fun Bookshelf(
                             modifier = Modifier.weight(1f)
                         )
                         IconButton(onClick = { onDelete(book) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "删除")
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
                         }
                     }
                     Text(
-                        "第${book.lastChapterIndex + 1}章 · 第${book.lastPageIndex + 1}页",
+                        "Chapter ${book.lastChapterIndex + 1} · Page ${book.lastPageIndex + 1}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

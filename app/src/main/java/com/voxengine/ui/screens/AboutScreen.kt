@@ -35,7 +35,7 @@ fun AboutScreen(navController: NavController = rememberNavController()) {
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (_: Exception) {
-            Toast.makeText(context, "无法打开链接", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Unable to open link", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -45,67 +45,67 @@ fun AboutScreen(navController: NavController = rememberNavController()) {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        TopAppBar(title = { Text("关于") })
+        TopAppBar(title = { Text("About") })
 
-        // 项目信息
+        // Project info
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("VoxEngine", style = MaterialTheme.typography.headlineMedium)
-                Text("版本 ${com.voxengine.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall,
+                Text("Version ${com.voxengine.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Android 系统级 TTS 语音合成引擎，支持多引擎切换、音色克隆与设计。" +
-                    "作为开源项目发布，不收取任何费用。",
+                    "Android system-level TTS engine supporting multi-engine switching, voice cloning and design. " +
+                    "Released as an open-source project, free of charge.",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(8.dp))
                 TextButton(onClick = { openUrl("https://github.com/Autsunset/VoxEngine") }) {
-                    Text("GitHub 项目页")
+                    Text("GitHub Project")
                 }
                 TextButton(onClick = { navController.navigate(Screen.Log.route) }) {
-                    Text("查看日志")
+                    Text("View Logs")
                 }
             }
         }
 
-        // 服务条款与隐私协议
+        // Terms of service & privacy
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("服务条款与隐私协议", style = MaterialTheme.typography.titleMedium)
+                Text("Terms of Service & Privacy", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "本软件使用小米 MiMo TTS API 进行语音合成，请遵守以下条款：",
+                    "This software uses the Xiaomi MiMo TTS API for speech synthesis. Please comply with the following terms:",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(4.dp))
                 TextButton(onClick = { openUrl("https://platform.xiaomimimo.com/docs/terms/user-agreement") }) {
-                    Text("MiMo 用户协议")
+                    Text("MiMo User Agreement")
                 }
                 TextButton(onClick = { openUrl("https://privacy.mi.com/XiaomiMiMoPlatform/zh_CN/") }) {
-                    Text("MiMo 隐私政策")
+                    Text("MiMo Privacy Policy")
                 }
             }
         }
 
-        // 免责声明
+        // Disclaimer
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("免责声明", style = MaterialTheme.typography.titleMedium)
+                Text("Disclaimer", style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "1. 本软件为开源项目，开发者不收取任何费用，不提供任何商业服务。" +
-                    "\n\n2. 本软件仅供学习和个人使用，严禁用于任何违法违规用途，包括但不限于：\n" +
-                    "   - 生成虚假信息、诈骗内容或误导性语音\n" +
-                    "   - 侵犯他人肖像权、声音权等合法权益\n" +
-                    "   - 批量自动化调用或用于商业牟利\n" +
-                    "   - 其他违反法律法规的行为" +
-                    "\n\n3. 本软件调用小米 MiMo API，用户须遵守小米 MiMo 平台的用户协议和使用条款。" +
-                    "任何因违反小米平台规则导致的后果（包括但不限于账号封禁），由用户自行承担。" +
-                    "\n\n4. Token Plan 可能仅限用于编程开发场景，将其接入第三方应用（如阅读器）进行语音合成" +
-                    "可能违反小米服务条款，导致账号被封禁。建议使用按量计费模式（当前限时免费）。" +
-                    "\n\n5. 开发者不对因使用本软件产生的任何直接或间接损失承担责任。" +
-                    "\n\n6. 使用本软件即表示您已阅读并同意上述条款。",
+                    "1. This software is an open-source project. The developer charges no fees and provides no commercial services." +
+                    "\n\n2. This software is for learning and personal use only. Any illegal use is strictly prohibited, including but not limited to:\n" +
+                    "   - Generating false information, fraudulent content, or misleading speech\n" +
+                    "   - Infringing on others' legitimate rights such as portrait rights or voice rights\n" +
+                    "   - Large-scale automated calls or using it for commercial profit\n" +
+                    "   - Any other behavior that violates laws and regulations" +
+                    "\n\n3. This software calls the Xiaomi MiMo API. Users must comply with the Xiaomi MiMo platform's user agreement and terms of use. " +
+                    "Any consequences of violating Xiaomi platform rules (including, but not limited to, account suspension) are borne by the user." +
+                    "\n\n4. Token Plan may be limited to programming/development scenarios. Connecting it to third-party apps (such as readers) for speech synthesis " +
+                    "may violate Xiaomi's terms of service and lead to account suspension. Usage-based billing (currently free for a limited time) is recommended." +
+                    "\n\n5. The developer is not liable for any direct or indirect losses arising from the use of this software." +
+                    "\n\n6. By using this software, you acknowledge that you have read and agreed to the above terms.",
                     style = MaterialTheme.typography.bodySmall,
                     lineHeight = MaterialTheme.typography.bodySmall.lineHeight
                 )

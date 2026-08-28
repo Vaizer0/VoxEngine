@@ -14,8 +14,8 @@ class CheckVoiceData : Activity() {
         super.onCreate(savedInstanceState)
 
         val resultIntent = Intent().apply {
-            // 返回数据完整的结果
-            putExtra(TextToSpeech.Engine.EXTRA_AVAILABLE_VOICES, arrayListOf("zho"))
+            // 返回数据完整的结果（zh=中/eng=英/jpn=日）
+            putExtra(TextToSpeech.Engine.EXTRA_AVAILABLE_VOICES, arrayListOf("zho", "eng", "jpn"))
             putExtra(TextToSpeech.Engine.EXTRA_UNAVAILABLE_VOICES, arrayListOf<String>())
         }
         setResult(TextToSpeech.Engine.CHECK_VOICE_DATA_PASS, resultIntent)

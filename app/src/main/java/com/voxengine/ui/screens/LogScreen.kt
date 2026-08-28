@@ -59,8 +59,7 @@ fun LogScreen() {
     val scope = rememberCoroutineScope()
     var dates by remember { mutableStateOf(emptyList<String>()) }
     var selectedDate by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf("全部") }
-    var startTime by remember { mutableStateOf("00:00") }
+    var level by remember { mutableStateOf("All") }    var startTime by remember { mutableStateOf("00:00") }
     var endTime by remember { mutableStateOf("23:59") }
     var keyword by remember { mutableStateOf("") }
     var entries by remember { mutableStateOf(emptyList<LogManager.LogEntry>()) }
@@ -75,12 +74,12 @@ fun LogScreen() {
             date = selectedDate.ifBlank { null },
             startMinute = startTime.toMinutesOrDefault(0),
             endMinute = endTime.toMinutesOrDefault(23 * 60 + 59),
-            level = level,
+            level = if (level == "All") "全部" else level,
             keyword = keyword
         )
         scope.launch {
             isLoading = true
-            statusText = "正在查询..."
+            statusText = "Querying..."
             val result = withContext(Dispatchers.IO) {
                 val availableDates = LogManager.getAvailableDates(appContext)
                 val nextDate = selectedDate.takeIf { it.isBlank() || it in availableDates }.orEmpty()
@@ -91,7 +90,7 @@ fun LogScreen() {
             selectedDate = result.second
             entries = result.third
             logPage = 0
-            statusText = "已查询 ${entries.size} 条"
+            statusText = "Found ${entries.size} entries"
             isLoading = false
         }
     }
@@ -102,7 +101,7 @@ fun LogScreen() {
     val safeLogPage = logPage.coerceIn(0, pageCount - 1)
     val visibleEntries = entries.drop(safeLogPage * LOG_PAGE_SIZE).take(LOG_PAGE_SIZE)
 
-    Scaffold(topBar = { TopAppBar(title = { Text("日志查询") }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text("Log Query") }) }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             Card(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                 Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -113,15 +112,15 @@ fun LogScreen() {
                             modifier = Modifier.weight(1f)
                         ) {
                             OutlinedTextField(
-                                value = selectedDate.ifBlank { "全部日期" },
+                                value = selectedDate.ifBlank { "All dates" },
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("日期") },
+                                label = { Text("Date") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dateExpanded) },
                                 modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                             )
                             ExposedDropdownMenu(expanded = dateExpanded, onDismissRequest = { dateExpanded = false }) {
-                                DropdownMenuItem(text = { Text("全部日期") }, onClick = { selectedDate = ""; dateExpanded = false; refresh() })
+                                DropdownMenuItem(text = { Text("All dates") }, onClick = { selectedDate = ""; dateExpanded = false; refresh() })
                                 dates.forEach { date ->
                                     DropdownMenuItem(text = { Text(date) }, onClick = { selectedDate = date; dateExpanded = false; refresh() })
                                 }
@@ -136,12 +135,12 @@ fun LogScreen() {
                                 value = level,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("级别") },
+                                label = { Text("Level") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(levelExpanded) },
                                 modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                             )
                             ExposedDropdownMenu(expanded = levelExpanded, onDismissRequest = { levelExpanded = false }) {
-                                listOf("全部", "E", "W", "I", "D").forEach { value ->
+                                listOf("All", "E", "W", "I", "D").forEach { value ->
                                     DropdownMenuItem(text = { Text(value) }, onClick = { level = value; levelExpanded = false; refresh() })
                                 }
                             }
@@ -152,14 +151,14 @@ fun LogScreen() {
                         OutlinedTextField(
                             value = startTime,
                             onValueChange = { startTime = it.take(5) },
-                            label = { Text("开始 HH:mm") },
+                            label = { Text("Start HH:mm") },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
                         OutlinedTextField(
                             value = endTime,
                             onValueChange = { endTime = it.take(5) },
-                            label = { Text("结束 HH:mm") },
+                            label = { Text("End HH:mm") },
                             modifier = Modifier.weight(1f),
                             singleLine = true
                         )
@@ -168,35 +167,35 @@ fun LogScreen() {
                     OutlinedTextField(
                         value = keyword,
                         onValueChange = { keyword = it },
-                        label = { Text("关键词") },
+                        label = { Text("Keyword") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        Button(enabled = !isLoading, onClick = { refresh() }) { Text(if (isLoading) "查询中" else "查询") }
+                        Button(enabled = !isLoading, onClick = { refresh() }) { Text(if (isLoading) "Querying" else "Query") }
                         OutlinedButton(enabled = entries.isNotEmpty() && !isLoading, onClick = {
                             scope.launch {
                                 try {
                                     val text = withContext(Dispatchers.Default) { LogManager.formatEntries(entries) }
                                     if (text.length > MAX_COPY_LOG_CHARS) {
-                                        Toast.makeText(context, "日志过长，请用导出结果", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, "Log too long, please use export instead", Toast.LENGTH_LONG).show()
                                     } else {
                                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                         clipboard.setPrimaryClip(ClipData.newPlainText("VoxEngine Log", text))
-                                        Toast.makeText(context, "已复制 ${entries.size} 条", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Copied ${entries.size} entries", Toast.LENGTH_SHORT).show()
                                     }
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "复制失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Copy failed: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
-                        }) { Text("复制结果") }
+                        }) { Text("Copy Result") }
                         OutlinedButton(enabled = entries.isNotEmpty() && !isLoading, onClick = {
                             scope.launch {
                                 try {
                                     val file = withContext(Dispatchers.IO) { LogManager.exportEntries(appContext, entries) }
                                     if (file == null) {
-                                        Toast.makeText(context, "没有可导出的日志", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "No logs to export", Toast.LENGTH_SHORT).show()
                                     } else {
                                         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
                                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -204,13 +203,13 @@ fun LogScreen() {
                                             putExtra(Intent.EXTRA_STREAM, uri)
                                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                         }
-                                        context.startActivity(Intent.createChooser(shareIntent, "导出日志"))
+                                        context.startActivity(Intent.createChooser(shareIntent, "Export logs"))
                                     }
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "导出失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
-                        }) { Text("导出结果") }
+                        }) { Text("Export Result") }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                         OutlinedButton(enabled = !isLoading, onClick = {
@@ -220,11 +219,11 @@ fun LogScreen() {
                                 entries = emptyList()
                                 logPage = 0
                                 refresh()
-                                Toast.makeText(context, "日志已清空", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Logs cleared", Toast.LENGTH_SHORT).show()
                             }
-                        }) { Text("清空日志") }
+                        }) { Text("Clear Logs") }
                         Text(
-                            (statusText.ifBlank { "${entries.size} 条结果" }) + "，日志保留7天",
+                            (statusText.ifBlank { "${entries.size} entries" }) + ", logs retained for 7 days",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 10.dp)
@@ -239,14 +238,14 @@ fun LogScreen() {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TextButton(enabled = safeLogPage > 0 && !isLoading, onClick = { logPage = safeLogPage - 1 }) { Text("上一页") }
+                TextButton(enabled = safeLogPage > 0 && !isLoading, onClick = { logPage = safeLogPage - 1 }) { Text("Previous") }
                 Text(
-                    "第${safeLogPage + 1}/${pageCount}页 · 当前${visibleEntries.size}条",
+                    "Page ${safeLogPage + 1}/${pageCount} · ${visibleEntries.size} entries",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 10.dp)
                 )
-                TextButton(enabled = safeLogPage < pageCount - 1 && !isLoading, onClick = { logPage = safeLogPage + 1 }) { Text("下一页") }
+                TextButton(enabled = safeLogPage < pageCount - 1 && !isLoading, onClick = { logPage = safeLogPage + 1 }) { Text("Next") }
             }
 
             LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
@@ -279,7 +278,7 @@ fun LogScreen() {
 }
 
 private fun String.toLogPreview(): String =
-    if (length <= LOG_MESSAGE_PREVIEW_LENGTH) this else take(LOG_MESSAGE_PREVIEW_LENGTH) + "...(已截断，导出可查看完整日志)"
+    if (length <= LOG_MESSAGE_PREVIEW_LENGTH) this else take(LOG_MESSAGE_PREVIEW_LENGTH) + "...(truncated, export to view full log)"
 
 private fun String.toMinutesOrDefault(defaultValue: Int): Int {
     val parts = split(':')

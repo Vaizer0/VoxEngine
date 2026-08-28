@@ -14,10 +14,10 @@ object VoiceGender {
     val ALL = listOf(MALE, FEMALE, NEUTRAL)
 
     fun labelOf(value: String?): String = when (value) {
-        MALE -> "男声"
-        FEMALE -> "女声"
-        NEUTRAL -> "中性"
-        else -> "未分类"
+        MALE -> "Male"
+        FEMALE -> "Female"
+        NEUTRAL -> "Neutral"
+        else -> "Unclassified"
     }
 }
 
@@ -30,11 +30,11 @@ object VoiceAgeGroup {
     val ALL = listOf(CHILD, YOUNG, MIDDLE, OLD)
 
     fun labelOf(value: String?): String = when (value) {
-        CHILD -> "儿童"
-        YOUNG -> "青年"
-        MIDDLE -> "中年"
-        OLD -> "老年"
-        else -> "未设置"
+        CHILD -> "Child"
+        YOUNG -> "Young adult"
+        MIDDLE -> "Middle-aged"
+        OLD -> "Senior"
+        else -> "Not set"
     }
 }
 
