@@ -17,6 +17,13 @@ android {
         versionName = "2026.08.28.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // sherpa-onnx ships per-ABI native libs; keep only the ABIs we target
+        // (arm64 for the vast majority of devices, armv7 for older ones) to avoid
+        // packaging unused x86/x86_64 emulator binaries in the APK.
+        ndk {
+            abiFilters += setOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     signingConfigs {
@@ -52,13 +59,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-
-    // sherpa-onnx ships per-ABI native libs; keep only the ABIs we actually target to avoid
-    // bloating the APK with unused emulator/x86 binaries while retaining arm64 (the vast
-    // majority of devices) and armv7 (older devices). All bundling of the AAR's jni files.
-    ndk {
-        abiFilters += listOf("arm64-v8a", "armeabi-v7a")
     }
 }
 
