@@ -16,7 +16,19 @@
 # sherpa-onnx: native JNI entry points must survive R8 (methods are called from .so via JNI).
 -keep class com.k2fsa.sherpa.onnx.** { *; }
 
-# commons-compress is used to extract model .tar.bz2 archives on-device; keep the
-# writer/reader service-loader entries that are looked up reflectively.
--keep class org.apache.commons.compress.** { *; }
+# commons-compress is used to extract model .tar.bz2 archives on-device. Keep only
+# the tar + bzip2 classes we reference; ignore R8's missing-class warnings for the
+# optional codecs (zstd/brotli/xz/lzma/asm/pack200) that aren't on the classpath.
+-keep class org.apache.commons.compress.archivers.tar.** { *; }
+-keep class org.apache.commons.compress.compressors.bzip2.** { *; }
+-keep class org.apache.commons.compress.utils.IOUtils { *; }
+-dontwarn org.tukaani.xz.**
+-dontwarn com.github.luben.zstd.**
+-dontwarn org.brotli.dec.**
+-dontwarn org.objectweb.asm.**
+-dontwarn org.apache.commons.compress.compressors.xz.**
+-dontwarn org.apache.commons.compress.compressors.lzma.**
+-dontwarn org.apache.commons.compress.compressors.zstandard.**
+-dontwarn org.apache.commons.compress.compressors.brotli.**
+-dontwarn org.apache.commons.compress.harmony.**
 
