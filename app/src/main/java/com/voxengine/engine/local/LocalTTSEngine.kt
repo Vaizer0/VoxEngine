@@ -130,7 +130,7 @@ class LocalTTSEngine(private val context: Context) : TTSEngine {
         val config = OfflineTtsConfig(
             model = OfflineTtsModelConfig(
                 vits = OfflineTtsVitsModelConfig(
-                    model = LocalModelManager.file(context, spec, "en_US-lessac-medium.onnx"),
+                    model = LocalModelManager.file(context, spec, spec.onnxFileName),
                     tokens = LocalModelManager.file(context, spec, "tokens.txt"),
                     dataDir = LocalModelManager.file(context, spec, "espeak-ng-data"),
                     noiseScale = 0.667f,
@@ -165,11 +165,11 @@ class LocalTTSEngine(private val context: Context) : TTSEngine {
                 LocalEngineFamily.PIPER -> {
                     result += VoiceInfo(
                         id = "${spec.id}:0",
-                        name = "Lessac",
-                        description = "Piper • Female English",
+                        name = spec.voiceName,
+                        description = "Piper • ${spec.gender} English",
                         type = VoiceType.PRESET,
                         engineId = id,
-                        gender = "Female",
+                        gender = spec.gender,
                         tags = listOf("Offline", "English")
                     )
                 }
@@ -199,14 +199,17 @@ class LocalTTSEngine(private val context: Context) : TTSEngine {
             val sid = parts.getOrNull(1)?.toIntOrNull() ?: 0
             return modelId to sid
         }
-        // Settings saves voice.name (e.g. "Bella"); map back to model + speaker id.
+        // Settings saves voice.name (e.g. "Bella", "Alan"); map back to a model + speaker id.
         for (spec in LocalModelManager.allModels) {
-            if (spec.family == LocalEngineFamily.KITTEN) {
-                LocalModelManager.kittenVoices().firstOrNull { it.name == voice }?.let {
-                    return spec.id to it.sid
+            when (spec.family) {
+                LocalEngineFamily.KITTEN -> {
+                    LocalModelManager.kittenVoices().firstOrNull { it.name == voice }?.let {
+                        return spec.id to it.sid
+                    }
                 }
-            } else if (voice == "Lessac") {
-                return spec.id to 0
+                LocalEngineFamily.PIPER -> {
+                    if (spec.voiceName == voice) return spec.id to 0
+                }
             }
         }
         return LocalModelManager.KITTEN_DEFAULT to 0

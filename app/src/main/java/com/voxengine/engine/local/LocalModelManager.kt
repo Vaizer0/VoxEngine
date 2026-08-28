@@ -34,17 +34,26 @@ data class LocalVoiceDef(
  * `tts-models` tag of k2-fsa/sherpa-onnx. After download + extraction the model
  * files live under `filesDir/models/<id>/` with a `.ready` marker to record
  * completion.
+ *
+ * Models are treated as an on-demand library: nothing is pre-bundled in the APK
+ * (aside from the shared native runtime). Each entry is a "source link" the user
+ * can download to local storage and delete again whenever they like.
  */
 data class LocalModelSpec(
     val id: String,
     val name: String,
+    val voiceName: String,
+    val gender: String,
     val description: String,
     val family: LocalEngineFamily,
     val archiveUrl: String,
     val rootDirName: String,
     val approxSizeMb: Int,
     val requiredFiles: List<String>
-)
+) {
+    /** The `.onnx` file inside the extracted model dir (e.g. `en_GB-alan-medium.onnx`). */
+    val onnxFileName: String get() = "$rootDirName.onnx"
+}
 
 sealed interface LocalModelState {
     data object NotDownloaded : LocalModelState
@@ -60,11 +69,13 @@ object LocalModelManager {
     private const val BASE_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models"
     private const val READY_MARKER = ".ready"
 
-    /** Default fast English model (Kitten, 8 voices). */
+    /** Default fast English model (Kitten, 8 voices in one archive). */
     val kitten = LocalModelSpec(
         id = "kitten-nano-en-v0_1-fp16",
         name = "Kitten (English)",
-        description = "Fast on-device English model, 8 voices (4 male, 4 female). Recommended default.",
+        voiceName = "Kitten",
+        gender = "Mixed",
+        description = "Fast on-device English model, 8 voices (4 male, 4 female). All 8 voices arrive in one ~27 MB download.",
         family = LocalEngineFamily.KITTEN,
         archiveUrl = "$BASE_URL/kitten-nano-en-v0_1-fp16.tar.bz2",
         rootDirName = "kitten-nano-en-v0_1-fp16",
@@ -72,19 +83,96 @@ object LocalModelManager {
         requiredFiles = listOf("model.fp16.onnx", "voices.bin", "tokens.txt", "espeak-ng-data")
     )
 
-    /** Optional higher-quality English Piper (VITS) model. */
-    val piper = LocalModelSpec(
-        id = "vits-piper-en_US-lessac-medium",
-        name = "Piper: Lessac (English)",
-        description = "Higher-quality English Piper/VITS voice. Larger download.",
+    private fun piperSpec(
+        model: String,
+        voiceName: String,
+        gender: String,
+        description: String,
+        approxSizeMb: Int
+    ) = LocalModelSpec(
+        id = model,
+        name = "Piper: $voiceName ($gender)",
+        voiceName = voiceName,
+        gender = gender,
+        description = description,
         family = LocalEngineFamily.PIPER,
-        archiveUrl = "$BASE_URL/vits-piper-en_US-lessac-medium.tar.bz2",
-        rootDirName = "vits-piper-en_US-lessac-medium",
-        approxSizeMb = 63,
-        requiredFiles = listOf("en_US-lessac-medium.onnx", "tokens.txt", "espeak-ng-data")
+        archiveUrl = "$BASE_URL/vits-piper-$model.tar.bz2",
+        rootDirName = model,
+        approxSizeMb = approxSizeMb,
+        requiredFiles = listOf("$model.onnx", "tokens.txt", "espeak-ng-data")
     )
 
-    val allModels: List<LocalModelSpec> = listOf(kitten, piper)
+    /**
+     * Piper ships each voice as its own model archive (~60 MB each), so every
+     * entry here is an individually-downloadable / deletable voice.
+     */
+    val piperCatalog: List<LocalModelSpec> = listOf(
+        piperSpec(
+            model = "en_GB-alan-medium",
+            voiceName = "Alan",
+            gender = "Male",
+            description = "Piper UK English male voice.",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_GB-cori-medium",
+            voiceName = "Cori",
+            gender = "Female",
+            description = "Piper UK English female voice.",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_US-amy-low",
+            voiceName = "Amy",
+            gender = "Female",
+            description = "Piper US English female voice (low).",
+            approxSizeMb = 22
+        ),
+        piperSpec(
+            model = "en_US-joe-medium",
+            voiceName = "Joe",
+            gender = "Male",
+            description = "Piper US English male voice.",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_US-kristin-medium",
+            voiceName = "Kristin",
+            gender = "Female",
+            description = "Piper US English female voice.",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_US-lessac-medium",
+            voiceName = "Lessac",
+            gender = "Female",
+            description = "Piper US English female voice.",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_US-libritts_r-medium",
+            voiceName = "Libritts",
+            gender = "Female",
+            description = "Piper US English female voice (LibriTTS).",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_US-lisa-medium",
+            voiceName = "Lisa",
+            gender = "Female",
+            description = "Piper US English female voice.",
+            approxSizeMb = 63
+        ),
+        piperSpec(
+            model = "en_US-ryan-high",
+            voiceName = "Ryan",
+            gender = "Male",
+            description = "Piper US English male voice (high quality).",
+            approxSizeMb = 113
+        )
+    )
+
+    val allModels: List<LocalModelSpec> = listOf(kitten) + piperCatalog
 
     /** Kitten's 8 built-in voices mapped from sid -> friendly name/gender (docs: sid->name). */
     fun kittenVoices(): List<LocalVoiceDef> = listOf(

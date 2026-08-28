@@ -221,7 +221,15 @@ class VoxEngineTTSService : TextToSpeechService() {
             equals("Hugo", ignoreCase = true) ||
             equals("Kiki", ignoreCase = true) ||
             equals("Leo", ignoreCase = true) ||
-            equals("Lessac", ignoreCase = true)
+            // Piper (sherpa-onnx) voice names are English
+            equals("Alan", ignoreCase = true) ||
+            equals("Cori", ignoreCase = true) ||
+            equals("Amy", ignoreCase = true) ||
+            equals("Joe", ignoreCase = true) ||
+            equals("Kristin", ignoreCase = true) ||
+            equals("Lisa", ignoreCase = true) ||
+            equals("Libritts", ignoreCase = true) ||
+            equals("Ryan", ignoreCase = true)
 
     private fun String.isJapaneseVoice(): Boolean =
         startsWith("ja-", ignoreCase = true) ||

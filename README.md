@@ -19,23 +19,33 @@ VoxEngine is **free to use**. Two of its engines need **no account, no API key, 
 
 Built on [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx), this engine synthesizes **entirely on your device**: no network connection, no API key, and nothing is uploaded — your text stays private.
 
-- **On-demand download** — models are ~25–65 MB and are downloaded once, then cached on-device for unlimited offline use.
-- **English-first** — natural English voices out of the box, plus a higher-quality alternative.
+- **On-demand voice library** — nothing is pre-installed. The APK ships only the shared on-device runtime; every voice is a **source link** you add when you need it and delete when you don't. Each voice is cached on your device for unlimited offline use.
+- **English-first** — a fast all-in-one Kitten model plus a wide selection of individual Piper voices (male & female, US & UK accents).
 
 **How it works:**
 
 1. In **Settings → Engine Selection**, choose **Local (Offline)**.
-2. In **Settings → Local / Offline Voices**, tap **Download** to install a model. Models are ~25–65 MB and are cached on your device after download (download once, use offline forever).
+2. In **Settings → Local / Offline Voices**, tap **Download** next to a voice to install it. Download once, use offline forever — and **Delete** any voice you no longer need to reclaim space.
 3. Pick one of the installed voices as your default voice and read/listen offline.
 
 **Available models:**
 
 | Model | Voices | Size | Notes |
 |-------|--------|------|-------|
-| Kitten (English) | 8 (4 male, 4 female) | ~25 MB | Fast, recommended default |
-| Piper: Lessac (English) | 1 (female) | ~63 MB | Higher quality, larger download |
+| Kitten (English) | 8 (4 male, 4 female) | ~27 MB | One download, all 8 voices included. Fast, recommended default |
+| Piper: Alan | 1 (male, UK) | ~63 MB | |
+| Piper: Cori | 1 (female, UK) | ~63 MB | |
+| Piper: Amy | 1 (female, US) | ~22 MB | |
+| Piper: Joe | 1 (male, US) | ~63 MB | |
+| Piper: Kristin | 1 (female, US) | ~63 MB | |
+| Piper: Lessac | 1 (female, US) | ~63 MB | |
+| Piper: Libritts | 1 (female, US) | ~63 MB | |
+| Piper: Lisa | 1 (female, US) | ~63 MB | |
+| Piper: Ryan | 1 (male, US) | ~113 MB | High quality |
 
-The Local engine exposes only installed (downloaded) voices. Sherpa-onnx is licensed under Apache-2.0; the bundled model weights carry their own permissive licenses.
+**Notes on sizing:** Kitten packs all 8 voices into a single archive, so its voices can't be downloaded one-by-one — you get all of them in one install. Each **Piper** entry is a separate voice model, so those can be added/removed individually. The Local engine exposes only installed (downloaded) voices. Sherpa-onnx is licensed under Apache-2.0; the bundled model weights carry their own permissive licenses.
+
+> **Why is the APK ~53 MB?** That size is **not** the voices — no model is bundled. It's the on-device **runtime** (onnxruntime + sherpa-onnx native libraries) needed to synthesize on your phone, and it ships for two CPU architectures (arm64 + armv7). The voices themselves are the separate, on-demand downloads listed above.
 
 ### Microsoft Edge TTS — free neural voices, no API key
 

@@ -598,7 +598,8 @@ private fun LocalVoicesCard(
             Spacer(Modifier.height(4.dp))
             Text(
                 "Free on-device English voices via sherpa-onnx. No network, no API key — fully private. " +
-                    "Models are downloaded once and cached on your device; separate from online engines.",
+                    "Nothing is pre-installed: download only the voices you need and delete the ones you don't. " +
+                    "Kitten is one model containing all 8 of its voices at once; each Piper entry is a single voice.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
