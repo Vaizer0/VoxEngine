@@ -51,4 +51,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: app/build/outputs/apk/release/*.apk
-          generate_release_notes: true
+          name: VoxEngine v${{ github.ref_name }}
+          body: "VoxEngine ${{ github.ref_name }} — fully English UI with prebuilt signed APK attached."
