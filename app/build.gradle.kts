@@ -13,8 +13,8 @@ android {
         applicationId = "com.voxengine"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2608131
-        versionName = "2026.08.13.1"
+        versionCode = 2608281
+        versionName = "2026.08.28.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,6 +53,13 @@ android {
         compose = true
         buildConfig = true
     }
+
+    // sherpa-onnx ships per-ABI native libs; keep only the ABIs we actually target to avoid
+    // bloating the APK with unused emulator/x86 binaries while retaining arm64 (the vast
+    // majority of devices) and armv7 (older devices). All bundling of the AAR's jni files.
+    ndk {
+        abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+    }
 }
 
 dependencies {
@@ -76,6 +83,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.jsoup)
+    implementation(libs.commons.compress)
+    // Prebuilt sherpa-onnx Android AAR (native ONNX TTS runtime for the Local/offline engine).
+    implementation(files("libs/sherpa-onnx-1.13.6.aar"))
     implementation(libs.kotlinx.coroutines.android)
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)

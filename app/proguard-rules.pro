@@ -13,3 +13,10 @@
 # VoiceEntity is reflected by Gson during voice config import/export.
 -keep class com.voxengine.data.VoiceEntity { *; }
 
+# sherpa-onnx: native JNI entry points must survive R8 (methods are called from .so via JNI).
+-keep class com.k2fsa.sherpa.onnx.** { *; }
+
+# commons-compress is used to extract model .tar.bz2 archives on-device; keep the
+# writer/reader service-loader entries that are looked up reflectively.
+-keep class org.apache.commons.compress.** { *; }
+

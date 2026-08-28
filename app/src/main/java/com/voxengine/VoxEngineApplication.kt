@@ -44,7 +44,7 @@ class VoxEngineApplication : Application() {
 
     private fun registerEngines() {
         val settings = SettingsRepository(this)
-        EngineBootstrap.ensureRegistered(settings)
+        EngineBootstrap.ensureRegistered(settings, this)
     }
 
     companion object {

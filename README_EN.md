@@ -15,9 +15,10 @@ If, besides text-to-speech, you also need complete novel-reading features — on
 
 ## Features
 
-- **Pluggable engine architecture** — unified interface design; currently supports MiMo TTS and Microsoft Edge TTS, with room to add more engines
+- **Pluggable engine architecture** — unified interface design; currently supports MiMo TTS, Microsoft Edge TTS (free, no API key), and Local (offline/sherpa-onnx)
+- **Free on-device Local voices** — optional English models (Kitten by default, Piper for higher quality) downloaded once and cached on the device. Fully offline, no network, no API key, fully private
 - **Preset voices** — built-in Chinese and English voices (Bingtang, Moli, Soda, Birch, Mia, Chloe, etc.), ready to use out of the box
-- **Automatic voice language detection** — the system TTS reports its language based on the current default voice: English voices report English, Japanese voices report Japanese, and everything else reports Chinese
+- **Automatic voice language detection** — the system TTS reports its language based on the current default voice: English voices report English, Japanese voices report Japanese, and everything else reports Chinese (Local offline voices report English)
 - **Voice cloning** — upload or record an audio sample to faithfully reproduce a target voice
 - **Voice design** — generate a custom voice from a text description, no audio file required
 - **Style control** — supports emotion, tone, dialect, role-play, and other style labels to switch pronunciation styles in a single step
@@ -130,6 +131,25 @@ Generate a custom voice from a text description, for example:
 
 You can choose a default style in the settings. To avoid the engine reading the prompt itself, the app no longer appends `(style)` to the body text. The system TTS language is reported automatically based on the current default voice: English content is best paired with an English voice, and Japanese content is best paired with an Edge Japanese voice.
 
+## Local (Offline) Voice Engine
+
+Beyond the online engines (MiMo and Edge), VoxEngine includes a fully **offline** engine built on [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). It needs no network connection, no API key, and keeps your text on-device — fully private.
+
+### How it works
+
+1. In **Settings → Engine Selection**, choose **Local (Offline)**.
+2. In **Settings → Local / Offline Voices**, tap **Download** to install a model. Models are ~25–65 MB and are cached on your device after download (download once, use offline forever).
+3. Pick one of the installed voices as your default voice and read/listen offline.
+
+### Available models
+
+| Model | Voices | Size | Notes |
+|-------|--------|------|-------|
+| Kitten (English) | 8 (4 male, 4 female) | ~25 MB | Fast, recommended default |
+| Piper: Lessac (English) | 1 (female) | ~63 MB | Higher quality, larger download |
+
+The Local engine exposes only installed (downloaded) voices. Sherpa-onnx is licensed under Apache-2.0; the bundled model weights carry their own permissive licenses.
+
 ## Logs
 
 The Logs page supports querying by date, time range, level, and keyword; results can be copied or exported. The app automatically redacts audio base64 data in the logs to avoid overly long logs or leaking audio content.
@@ -153,6 +173,7 @@ If you use Token Plan, you can choose from the following nodes:
 - **Storage**: Room + DataStore
 - **Network**: OkHttp
 - **Audio**: Android AudioTrack
+- **Offline TTS**: sherpa-onnx (native ONNX runtime)
 - **Minimum version**: Android 8.0 (API 26)
 
 ## Build
@@ -172,6 +193,7 @@ This software is an open-source project intended for learning and personal use o
 ## Acknowledgements
 
 - [MiMo TTS](https://platform.xiaomimimo.com?ref=S5T7WV) — Xiaomi MiMo speech synthesis API
+- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) — Apache-2.0 licensed on-device TTS runtime powering the Local (offline) engine
 
 ## License
 

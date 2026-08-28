@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -19,6 +20,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
@@ -53,7 +55,11 @@ import com.voxengine.data.AppDatabase
 import com.voxengine.data.SettingsRepository
 import com.voxengine.engine.EngineRegistry
 import com.voxengine.engine.TTSEngine
+import com.voxengine.engine.local.LocalModelManager
+import com.voxengine.engine.local.LocalModelSpec
+import com.voxengine.engine.local.LocalModelState
 import com.voxengine.engine.mimo.MiMoEngine
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -103,9 +109,11 @@ fun SettingsScreen() {
     LaunchedEffect(defaultStyle) { styleInput = defaultStyle }
 
     val activeEngine = remember(currentEngineId) { EngineRegistry.get(currentEngineId) }
-    
+    // Refresh the preset voice list when a Local (offline) model is downloaded/deleted.
+    val localModelVersion by LocalModelManager.state.collectAsState()
+
     // 预设音色
-    val presetVoices by produceState(initialValue = emptyList(), activeEngine) {
+    val presetVoices by produceState(initialValue = emptyList(), activeEngine, localModelVersion) {
         value = activeEngine?.getVoices() ?: emptyList()
     }
     
@@ -258,6 +266,12 @@ fun SettingsScreen() {
                 }
             }
         }
+
+        // 本地离线音色（sherpa-onnx）
+        LocalVoicesCard(
+            currentEngineId = currentEngineId,
+            scope = scope
+        )
 
         // API 配置
         Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
@@ -565,6 +579,110 @@ fun SettingsScreen() {
                 )
             }
         }
+        }
+    }
+}
+
+@Composable
+private fun LocalVoicesCard(
+    currentEngineId: String,
+    scope: CoroutineScope
+) {
+    val context = LocalContext.current
+    val modelStates by LocalModelManager.state.collectAsState()
+    val anythingReady = LocalModelManager.allModels.any { LocalModelManager.isReady(context, it) }
+
+    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Local / Offline Voices", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "Free on-device English voices via sherpa-onnx. No network, no API key — fully private. " +
+                    "Models are downloaded once and cached on your device; separate from online engines.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(4.dp))
+            if (currentEngineId == "local" && !anythingReady) {
+                Text(
+                    "The Local engine is selected but no model is installed yet. Download one below to start speaking offline.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Spacer(Modifier.height(4.dp))
+            }
+
+            LocalModelManager.allModels.forEach { spec ->
+                val state = modelStates[spec.id] ?: LocalModelState.NotDownloaded
+                LocalModelRow(
+                    context = context,
+                    spec = spec,
+                    state = state,
+                    scope = scope
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LocalModelRow(
+    context: android.content.Context,
+    spec: LocalModelSpec,
+    state: LocalModelState,
+    scope: CoroutineScope
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(spec.name, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                "${spec.description} • ~${spec.approxSizeMb} MB",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            when (state) {
+                is LocalModelState.Downloading -> {
+                    Spacer(Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { state.progress },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        "${(state.progress * 100).toInt()}%",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                is LocalModelState.Failed -> {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Download failed: ${state.message}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                else -> {}
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        val installed = LocalModelManager.isReady(context, spec) || state == LocalModelState.Ready
+        when {
+            installed -> OutlinedButton(
+                onClick = {
+                    scope.launch(Dispatchers.IO) { LocalModelManager.delete(context, spec) }
+                }
+            ) { Text("Delete") }
+            state is LocalModelState.Downloading -> Text("Downloading…", style = MaterialTheme.typography.labelLarge)
+            else -> Button(
+                onClick = {
+                    scope.launch(Dispatchers.IO) { LocalModelManager.download(context, spec) }
+                }
+            ) { Text("Download") }
         }
     }
 }

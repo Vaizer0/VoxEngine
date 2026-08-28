@@ -48,7 +48,7 @@ class VoxEngineTTSService : TextToSpeechService() {
                 ttsConcurrency = s.ttsConcurrency.first()
             }
 
-            EngineBootstrap.ensureRegistered(s)
+            EngineBootstrap.ensureRegistered(s, this)
 
             serviceScope.launch { s.currentEngine.collect { currentEngine = it } }
             serviceScope.launch { s.defaultVoice.collect { currentVoice = it } }
@@ -208,7 +208,20 @@ class VoxEngineTTSService : TextToSpeechService() {
             equals("Mia", ignoreCase = true) ||
             equals("Chloe", ignoreCase = true) ||
             equals("Milo", ignoreCase = true) ||
-            equals("Dean", ignoreCase = true)
+            equals("Dean", ignoreCase = true) ||
+            // Local (offline/sherpa-onnx) voices are English
+            contains("kitten-nano", ignoreCase = true) ||
+            startsWith("vits-piper-en", ignoreCase = true) ||
+            contains("-kitten-", ignoreCase = true) ||
+            equals("Bella", ignoreCase = true) ||
+            equals("Jasper", ignoreCase = true) ||
+            equals("Luna", ignoreCase = true) ||
+            equals("Bruno", ignoreCase = true) ||
+            equals("Rosie", ignoreCase = true) ||
+            equals("Hugo", ignoreCase = true) ||
+            equals("Kiki", ignoreCase = true) ||
+            equals("Leo", ignoreCase = true) ||
+            equals("Lessac", ignoreCase = true)
 
     private fun String.isJapaneseVoice(): Boolean =
         startsWith("ja-", ignoreCase = true) ||
