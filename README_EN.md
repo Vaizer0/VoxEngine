@@ -44,37 +44,37 @@ MiMo offers two billing modes:
 
 > New users are recommended to use **pay-as-you-go** billing (currently free for a limited time); the API Key starts with `sk-`.
 
-![Create API Key](1新建APIkey1.png)
+![Create API Key](01-create-api-key.png)
 
 ### 2. Copy the API Key
 
 After creating it, copy the API Key.
 
-![Copy API Key](2复制apikey.png)
+![Copy API Key](02-copy-api-key.png)
 
 ### 3. Enter the API Key in VoxEngine
 
 Open VoxEngine → Settings page, choose the billing mode, enter the API Key, and tap "Save API Configuration". Then pick your preferred default voice and style.
 
-![Enter API Key](3app界面，这里填入apikey.jpg)
+![Enter API Key](03-enter-api-key.jpg)
 
 ### 4. Open the system TTS settings
 
 On the VoxEngine settings page tap "Go to Settings" to jump to the system text-to-speech settings page.
 
-![Go to Settings](4app界面，点击这里进入系统默认tts引擎切换.jpg)
+![Go to Settings](04-open-system-tts-settings.jpg)
 
 ### 5. Switch the preferred engine (step one)
 
 In the system TTS settings, tap "Preferred engine".
 
-![Switch preferred engine](5切换首选引擎1.jpg)
+![Switch preferred engine](05-switch-preferred-engine.jpg)
 
 ### 6. Select VoxEngine (step two)
 
 Select **VoxEngine** from the engine list. Done!
 
-![Select VoxEngine](6切换首选引擎2.jpg)
+![Select VoxEngine](06-select-voxengine.jpg)
 
 Now any app that supports system TTS (such as 阅读 Vox) can use VoxEngine directly for speech synthesis.
 

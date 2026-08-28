@@ -44,37 +44,37 @@ MiMo 提供两种计费模式：
 
 > 建议新手使用**按量计费**模式（当前限时免费），API Key 以 `sk-` 开头。
 
-![新建 API Key](1新建APIkey1.png)
+![新建 API Key](01-create-api-key.png)
 
 ### 2. 复制 API Key
 
 创建完成后复制 API Key。
 
-![复制 API Key](2复制apikey.png)
+![复制 API Key](02-copy-api-key.png)
 
 ### 3. 在 VoxEngine 中填入 API Key
 
 打开 VoxEngine → 设置页面，选择计费模式，填入 API Key，点击「保存 API 配置」。然后选择你喜欢的默认音色和风格。
 
-![填入 API Key](3app界面，这里填入apikey.jpg)
+![填入 API Key](03-enter-api-key.jpg)
 
 ### 4. 进入系统 TTS 设置
 
 在 VoxEngine 设置页点击「前往设置」，跳转到系统文字转语音设置页面。
 
-![点击前往设置](4app界面，点击这里进入系统默认tts引擎切换.jpg)
+![点击前往设置](04-open-system-tts-settings.jpg)
 
 ### 5. 切换首选引擎（第一步）
 
 在系统 TTS 设置中，点击「首选引擎」。
 
-![切换首选引擎](5切换首选引擎1.jpg)
+![切换首选引擎](05-switch-preferred-engine.jpg)
 
 ### 6. 选择 VoxEngine（第二步）
 
 在引擎列表中选择 **VoxEngine**，完成！
 
-![选择 VoxEngine](6切换首选引擎2.jpg)
+![选择 VoxEngine](06-select-voxengine.jpg)
 
 现在任意支持系统 TTS 的应用（如阅读 Vox）都可以直接使用 VoxEngine 进行语音合成了。
 
