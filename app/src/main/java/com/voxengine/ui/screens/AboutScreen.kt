@@ -60,7 +60,7 @@ fun AboutScreen(navController: NavController = rememberNavController()) {
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(8.dp))
-                TextButton(onClick = { openUrl("https://github.com/Autsunset/VoxEngine") }) {
+                TextButton(onClick = { openUrl("https://github.com/Vaizer0/VoxEngine") }) {
                     Text("GitHub Project")
                 }
                 TextButton(onClick = { navController.navigate(Screen.Log.route) }) {
