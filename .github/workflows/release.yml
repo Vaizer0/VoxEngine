@@ -25,16 +25,16 @@ jobs:
 
       - name: Restore release keystore
         env:
-          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: |
-          test -n "$RELEASE_KEYSTORE_BASE64"
-          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > voxengine.jks
+          test -n "$SIGNING_KEY"
+          printf '%s' "$SIGNING_KEY" | base64 --decode > voxengine.jks
 
       - name: Build signed release APK
         env:
-          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease
 
       - name: Upload release APK artifact
