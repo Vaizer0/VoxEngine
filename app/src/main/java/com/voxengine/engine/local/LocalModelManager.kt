@@ -44,14 +44,7 @@ data class LocalModelSpec(
     val rootDirName: String,
     val approxSizeMb: Int,
     val requiredFiles: List<String>
-) {
-    /** Speaker count exposed in the voice picker for this model family. */
-    val speakerCount: Int
-        get() = when (family) {
-            LocalEngineFamily.KITTEN -> kittenVoices().size
-            LocalEngineFamily.PIPER -> 1
-        }
-}
+)
 
 sealed interface LocalModelState {
     data object NotDownloaded : LocalModelState
