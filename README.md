@@ -2,14 +2,14 @@
 
 VoxEngine is an Android **system-level TTS speech synthesis engine** with pluggable engine switching, voice cloning, and voice design. Once registered as a system TTS service, it can be used directly by any app that relies on the Android system TTS API (such as the Legado reader).
 
-## Also reading novels? Try 阅读 Vox
+## Also reading novels? Try Legado Vox
 
-If, besides text-to-speech, you also need complete novel-reading features — online book sources, local reading, AI chapter summaries, AI rewriting, multi-character voice acting, listening cache, and more — check out [阅读 Vox (Legado Vox)](https://github.com/Autsunset/legado-vox). It is a standalone reader and listening app developed as a fork of Legado and legado-with-MD3.
+If, besides text-to-speech, you also need complete novel-reading features — online book sources, local reading, AI chapter summaries, AI rewriting, multi-character voice acting, listening cache, and more — check out [Legado Vox](https://github.com/Autsunset/legado-vox). It is a standalone reader and listening app developed as a fork of Legado and legado-with-MD3.
 
 - [Project homepage & details](https://github.com/Autsunset/legado-vox)
-- [Download 阅读 Vox APK](https://github.com/Autsunset/legado-vox/releases)
+- [Download Legado Vox APK](https://github.com/Autsunset/legado-vox/releases)
 
-阅读 Vox and VoxEngine are independent projects; installing or using 阅读 Vox does not depend on VoxEngine. 阅读 Vox can configure MiMo cloud TTS directly from within the app; if VoxEngine is already installed, you can set it as the Android system TTS and use it from 阅读 Vox or any other app.
+Legado Vox and VoxEngine are independent projects; installing or using Legado Vox does not depend on VoxEngine. Legado Vox can configure MiMo cloud TTS directly from within the app; if VoxEngine is already installed, you can set it as the Android system TTS and use it from Legado Vox or any other app.
 
 ## Free — no account, no API key, even fully offline
 
@@ -171,9 +171,9 @@ In the system TTS settings, tap "Preferred engine".
 
 Select **VoxEngine** from the engine list. Done!
 
-Now any app that supports system TTS (such as 阅读 Vox) can use VoxEngine directly for speech synthesis.
+Now any app that supports system TTS (such as Legado Vox) can use VoxEngine directly for speech synthesis.
 
-> Using it in 阅读 Vox: make sure VoxEngine is set as the system default engine, then open 阅读 Vox → reading screen → reading settings → engine & voice, and select the corresponding system TTS.
+> Using it in Legado Vox: make sure VoxEngine is set as the system default engine, then open Legado Vox → reading screen → reading settings → engine & voice, and select the corresponding system TTS.
 
 ### Token Plan Nodes
 
