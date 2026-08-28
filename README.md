@@ -1,5 +1,7 @@
 # VoxEngine
 
+[English](README_EN.md) · 中文
+
 Android 系统级 TTS 语音合成引擎，支持多引擎切换、音色克隆与设计。注册为系统 TTS 服务后，任意支持系统语音合成的应用（如 Legado 阅读器）均可直接调用。
 
 ## 还需要看小说？可以试试阅读 Vox
