@@ -43,3 +43,10 @@ jobs:
           name: VoxEngine-release-apk
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/release/*.apk
+          generate_release_notes: true
