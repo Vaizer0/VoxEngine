@@ -1,201 +1,198 @@
 # VoxEngine
 
-[English](README_EN.md) · 中文
+VoxEngine is an Android **system-level TTS speech synthesis engine** with pluggable engine switching, voice cloning, and voice design. Once registered as a system TTS service, it can be used directly by any app that relies on the Android system TTS API (such as the Legado reader).
 
-Android 系统级 TTS 语音合成引擎，支持多引擎切换、音色克隆与设计。注册为系统 TTS 服务后，任意支持系统语音合成的应用（如 Legado 阅读器）均可直接调用。
+## Also reading novels? Try 阅读 Vox
 
-## 还需要看小说？可以试试阅读 Vox
+If, besides text-to-speech, you also need complete novel-reading features — online book sources, local reading, AI chapter summaries, AI rewriting, multi-character voice acting, listening cache, and more — check out [阅读 Vox (Legado Vox)](https://github.com/Autsunset/legado-vox). It is a standalone reader and listening app developed as a fork of Legado and legado-with-MD3.
 
-如果你除了听书，还需要网络书源、本地阅读、AI 章节梗概、AI 改写、多角色配音和听书缓存等完整的小说阅读功能，可以使用 [阅读 Vox（Legado Vox）](https://github.com/Autsunset/legado-vox)。它是基于 Legado 与 legado-with-MD3 二次开发的独立阅读与听书应用。
+- [Project homepage & details](https://github.com/Autsunset/legado-vox)
+- [Download 阅读 Vox APK](https://github.com/Autsunset/legado-vox/releases)
 
-- [项目主页与详细说明](https://github.com/Autsunset/legado-vox)
-- [下载阅读 Vox APK](https://github.com/Autsunset/legado-vox/releases)
+阅读 Vox and VoxEngine are independent projects; installing or using 阅读 Vox does not depend on VoxEngine. 阅读 Vox can configure MiMo cloud TTS directly from within the app; if VoxEngine is already installed, you can set it as the Android system TTS and use it from 阅读 Vox or any other app.
 
-阅读 Vox 与 VoxEngine 是相互独立的项目，安装或使用阅读 Vox 不依赖 VoxEngine。阅读 Vox 可以直接在应用内配置 MiMo 云 TTS；如果已经安装 VoxEngine，也可以把它设为 Android 系统 TTS 后供阅读 Vox 或其他应用调用。
+## Features
 
-## 功能特性
+- **Pluggable engine architecture** — unified interface design; currently supports MiMo TTS, Microsoft Edge TTS (free, no API key), and Local (offline/sherpa-onnx)
+- **Free on-device Local voices** — optional English models (Kitten by default, Piper for higher quality) downloaded once and cached on the device. Fully offline, no network, no API key, fully private
+- **Preset voices** — built-in Chinese and English voices (Bingtang, Moli, Soda, Birch, Mia, Chloe, etc.), ready to use out of the box
+- **Automatic voice language detection** — the system TTS reports its language based on the current default voice: English voices report English, Japanese voices report Japanese, and everything else reports Chinese (Local offline voices report English)
+- **Voice cloning** — upload or record an audio sample to faithfully reproduce a target voice
+- **Voice design** — generate a custom voice from a text description, no audio file required
+- **Style control** — supports emotion, tone, dialect, role-play, and other style labels to switch pronunciation styles in a single step
+- **System TTS integration** — runs as an Android `TextToSpeechService`, usable by any app that supports system TTS
+- **Built-in reading bookshelf** — import local TXT and EPUB novels, read by chapter/table of contents, and save reading progress
+- **Built-in listening** — start listening from the current page or a selected paragraph, synthesizing in order and pre-caching subsequent content
+- **Listening stability optimizations** — re-synthesizes the current segment if prefetching fails, avoiding skipped segments during network jitter; progress is not saved early before audio finishes playing
+- **Clone voice throttling settings** — the request interval, retry count, and retry wait for clone/design voices can be adjusted in the reader settings
+- **Log query & export** — query logs by date, time range, level, and keyword; copy or export the results
+- **Voice import/export** — export custom voices to JSON files for easy backup and sharing
 
-- **可插拔引擎架构** — 统一接口设计，当前支持 MiMo TTS、微软 Edge TTS（免费、无需 API Key）与本地离线引擎（sherpa-onnx）
-- **免费的本地离线音色** — 可选英文模型（默认为 Kitten，另有更高音质的 Piper），下载一次后缓存到设备，完全离线、无需网络、无需 API Key、完全隐私
-- **预设音色** — 内置多种中英文音色（冰糖、茉莉、苏打、白桦、Mia、Chloe 等），开箱即用
-- **音色语言自动识别** — 系统 TTS 语言按当前默认音色自动上报：英文音色返回 English，日语音色返回 Japanese，其它返回中文（本地离线音色返回 English）
-- **音色克隆** — 上传或录制一段音频样本，精准复刻目标音色
-- **音色设计** — 通过文字描述自动生成定制音色，无需音频文件
-- **风格控制** — 支持情绪、语调、方言、角色扮演等风格标签，一句话切换发音风格
-- **系统 TTS 集成** — 作为 Android TextToSpeechService 运行，所有支持系统 TTS 的应用均可使用
-- **内置阅读书架** — 支持导入本地 TXT 与 EPUB 小说，按章节/目录阅读并保存阅读进度
-- **内置听书** — 阅读页可从当前页或选中段落开始听书，顺序合成并预缓存后续内容
-- **听书稳定性优化** — 预取失败时自动补合成当前段，避免网络抖动导致跳段；音频未播完不会提前保存进度
-- **克隆音色限流设置** — 克隆/设计音色的请求间隔、重试次数和重试等待可在阅读设置中调整
-- **日志查询与导出** — 支持按日期、时间段、级别和关键词查询日志，复制或导出结果
-- **音色导入导出** — 支持将自定义音色导出为 JSON 文件，方便备份与分享
+## Illustrated Tutorial
 
-## 图文教程
+### 1. Register on the MiMo platform
 
-### 1. 注册 MiMo 平台
+Go to the [Xiaomi MiMo TTS platform](https://platform.xiaomimimo.com?ref=S5T7WV), register an account, and create an API Key in the console.
 
-前往 [小米 MiMo TTS 平台](https://platform.xiaomimimo.com?ref=S5T7WV) 注册账号，在控制台新建 API Key。
+MiMo offers two billing modes:
 
-MiMo 提供两种计费模式：
+| Billing mode | API Key format | Description |
+|--------------|----------------|-------------|
+| Pay-as-you-go | `sk-xxxxx` | Free for a limited time, billed per call |
+| Token Plan | `tp-xxxxx` | Requires purchasing a Token plan; China / Singapore / Europe nodes available |
 
-| 计费模式 | API Key 格式 | 说明 |
-|---------|-------------|------|
-| 按量计费 | `sk-xxxxx` | 限时免费，按调用次数计费 |
-| Token Plan | `tp-xxxxx` | 需购买 Token 套餐，中国区/新加坡/欧洲节点可选 |
+> New users are recommended to use **pay-as-you-go** billing (currently free for a limited time); the API Key starts with `sk-`.
 
-> 建议新手使用**按量计费**模式（当前限时免费），API Key 以 `sk-` 开头。
+![Create API Key](01-create-api-key.png)
 
-![新建 API Key](01-create-api-key.png)
+### 2. Copy the API Key
 
-### 2. 复制 API Key
+After creating it, copy the API Key.
 
-创建完成后复制 API Key。
+![Copy API Key](02-copy-api-key.png)
 
-![复制 API Key](02-copy-api-key.png)
+### 3. Enter the API Key in VoxEngine
 
-### 3. 在 VoxEngine 中填入 API Key
+Open VoxEngine → Settings page, choose the billing mode, enter the API Key, and tap "Save API Configuration". Then pick your preferred default voice and style.
 
-打开 VoxEngine → 设置页面，选择计费模式，填入 API Key，点击「保存 API 配置」。然后选择你喜欢的默认音色和风格。
+![Enter API Key](03-enter-api-key.jpg)
 
-![填入 API Key](03-enter-api-key.jpg)
+### 4. Open the system TTS settings
 
-### 4. 进入系统 TTS 设置
+On the VoxEngine settings page tap "Go to Settings" to jump to the system text-to-speech settings page.
 
-在 VoxEngine 设置页点击「前往设置」，跳转到系统文字转语音设置页面。
+![Go to Settings](04-open-system-tts-settings.jpg)
 
-![点击前往设置](04-open-system-tts-settings.jpg)
+### 5. Switch the preferred engine (step one)
 
-### 5. 切换首选引擎（第一步）
+In the system TTS settings, tap "Preferred engine".
 
-在系统 TTS 设置中，点击「首选引擎」。
+![Switch preferred engine](05-switch-preferred-engine.jpg)
 
-![切换首选引擎](05-switch-preferred-engine.jpg)
+### 6. Select VoxEngine (step two)
 
-### 6. 选择 VoxEngine（第二步）
+Select **VoxEngine** from the engine list. Done!
 
-在引擎列表中选择 **VoxEngine**，完成！
+![Select VoxEngine](06-select-voxengine.jpg)
 
-![选择 VoxEngine](06-select-voxengine.jpg)
+Now any app that supports system TTS (such as 阅读 Vox) can use VoxEngine directly for speech synthesis.
 
-现在任意支持系统 TTS 的应用（如阅读 Vox）都可以直接使用 VoxEngine 进行语音合成了。
+> Using it in 阅读 Vox: make sure VoxEngine is set as the system default engine, then open 阅读 Vox → reading screen → reading settings → engine & voice, and select the corresponding system TTS.
 
-> 在阅读 Vox 中使用：确保 VoxEngine 已设为系统默认引擎，打开阅读 Vox → 阅读界面 → 朗读设置 → 引擎与音色，选择对应的系统 TTS 即可。
+## Built-in Reading & Listening
 
-## 内置阅读与听书
+VoxEngine also includes a simple bookshelf where you can import multiple local TXT or EPUB novels. For EPUB, chapters are generated from the in-book table-of-contents titles and the spine body order, and the XHTML body is extracted for reading and listening. On the reading screen, tap the middle to show the top/bottom menus, which support table-of-contents navigation, left/right page turns, listening from a selected paragraph, timed stop, and stop after a number of chapters.
 
-VoxEngine 也内置了简易书架，可直接导入多本本地 TXT 或 EPUB 小说。EPUB 会按照书内目录标题和 spine 正文顺序生成章节，并提取 XHTML 正文用于阅读与听书。阅读页点击屏幕中间会显示顶部/底部菜单，支持目录跳转、左右翻页、从选中段落开始听书、定时停止和播放若干章节后停止。
+Built-in listening uses sequential synthesis with prefetch caching: while playing the current content it first preloads the rest of the current chapter in order, then gradually increases the prefetched page count of the next chapter after each page is finished. If the network jitters or prefetching fails, it re-synthesizes the current segment where playback is, minimizing skipped segments. Clone/design voice request interval and retry parameters can be tuned to reduce the chance of 429 throttling.
 
-内置听书采用顺序合成和预缓存逻辑：播放当前内容时会先按顺序预加载当前章节剩余内容，再随每读完一页逐步增加下一章预加载页数。遇到网络抖动或预取失败时，会在当前位置补合成当前段，尽量避免跳段。克隆/设计音色可调请求间隔与重试参数，用于降低 429 限流概率。
+## Voices
 
-## 音色说明
+### Preset voices (recommended)
 
-### 预设音色（推荐）
+> Preset voices work out of the box and give the best results. Preset voices also support custom style labels, so you can freely combine tone, emotion, dialect, and other styles.
 
-> 预设音色开箱即用，效果最佳。预设音色同样支持自定义风格标签，可以自由搭配语调、情绪、方言等风格。
+| Voice | Description |
+|-------|-------------|
+| Bingtang | Sweet cute female |
+| Moli | Gentle graceful female |
+| Soda | Energetic sunny male |
+| Birch | Deep magnetic male |
+| Mia | English female |
+| Chloe | English female |
+| Milo | English male |
+| Dean | English male |
 
-| 音色 | 描述 |
-|------|------|
-| 冰糖 | 甜美可爱女声 |
-| 茉莉 | 温柔知性女声 |
-| 苏打 | 活力阳光男声 |
-| 白桦 | 沉稳磁性男声 |
-| Mia | 英文女声 |
-| Chloe | 英文女声 |
-| Milo | 英文男声 |
-| Dean | 英文男声 |
+### Voice cloning
 
-### 音色克隆
+Upload or record a reference audio clip (3-10 seconds recommended). MiMo clones a similar voice based on the audio features. Ideal for reproducing a specific character's voice.
 
-上传或录制一段参考音频（建议 3-10 秒），MiMo 会根据音频特征克隆出相似的音色。适用于复刻特定角色的声音。
+> The quality of custom voices (clone/design) depends on the input material and description, and may require several rounds of tuning to achieve the desired result.
 
-> 自定义音色（克隆/设计）效果取决于输入素材和描述，可能需要多次调试才能达到理想效果。
+### Voice design
 
-### 音色设计
+Generate a custom voice from a text description, for example:
+- "A gentle, magnetic middle-aged male voice"
+- "A lively, cute girl's voice"
+- "A low, husky narration voice"
 
-通过文字描述生成定制音色，例如：
-- "温柔磁性的中年男声"
-- "活泼可爱的少女音"
-- "低沉沙哑的旁白声"
+## Supported Styles
 
-## 支持的风格
+| Type | Examples |
+|------|----------|
+| Basic emotions | Happy, Sad, Angry, Fearful, Excited, Calm, Cold |
+| Compound emotions | Melancholy, Gratified, Helpless, Guilty, Relieved, Moved |
+| Overall tone | Gentle, Aloof, Lively, Serious, Languid, Deep, Capable |
+| Voice character | Magnetic, Mellow, Bright, Ethereal, Sweet, Hoarse |
+| Character tones | Baby-voice, Elegant-lady, Boyish, Uncle, Taiwan-accent |
+| Dialects | Cantonese, Sichuan-dialect |
+| Other | Whisper, Singing |
 
-| 类型 | 示例 |
-|------|------|
-| 基础情绪 | 开心、悲伤、愤怒、恐惧、兴奋、平静、冷漠 |
-| 复合情绪 | 怅然、欣慰、无奈、愧疚、释然、动情 |
-| 整体语调 | 温柔、高冷、活泼、严肃、慵懒、深沉、干练 |
-| 音色质感 | 磁性、醇厚、清亮、空灵、甜美、沙哑 |
-| 人设腔调 | 夹子音、御姐音、正太音、大叔音、台湾腔 |
-| 方言 | 粤语、四川话 |
-| 角色扮演 | 孙悟空、林黛玉 |
-| 唱歌 | 唱歌 |
+You can choose a default style in the settings. To avoid the engine reading the prompt itself, the app no longer appends `(style)` to the body text. The system TTS language is reported automatically based on the current default voice: English content is best paired with an English voice, and Japanese content is best paired with an Edge Japanese voice.
 
-风格可以在设置中选择默认风格。为避免提示词被 TTS 读出，应用不会再把 `(风格)` 拼接进正文文本。系统 TTS 语言会按当前默认音色自动上报，英文内容建议搭配英文音色，日语内容建议搭配 Edge 日语音色使用。
+## Local (Offline) Voice Engine
 
-## 本地离线音色引擎
+Beyond the online engines (MiMo and Edge), VoxEngine includes a fully **offline** engine built on [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). It needs no network connection, no API key, and keeps your text on-device — fully private.
 
-除在线引擎（MiMo 与 Edge）外，VoxEngine 还内置了一个**完全离线**的引擎，基于 [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)。它不需要网络、不需要 API Key，且文本只在设备本地处理，完全隐私。
+### How it works
 
-### 使用方法
+1. In **Settings → Engine Selection**, choose **Local (Offline)**.
+2. In **Settings → Local / Offline Voices**, tap **Download** to install a model. Models are ~25–65 MB and are cached on your device after download (download once, use offline forever).
+3. Pick one of the installed voices as your default voice and read/listen offline.
 
-1. 在 **设置 → 引擎选择** 中，选择 **Local (Offline)**。
-2. 在 **设置 → 本地 / 离线音色** 中，点击 **下载** 安装模型。模型约 25–65 MB，下载一次后缓存到设备，之后可永久离线使用。
-3. 选择已安装的音色作为默认音色，即可离线朗读/听书。
+### Available models
 
-### 可选模型
+| Model | Voices | Size | Notes |
+|-------|--------|------|-------|
+| Kitten (English) | 8 (4 male, 4 female) | ~25 MB | Fast, recommended default |
+| Piper: Lessac (English) | 1 (female) | ~63 MB | Higher quality, larger download |
 
-| 模型 | 音色 | 大小 | 说明 |
-|------|------|------|------|
-| Kitten（英文） | 8（4 男 4 女） | 约 25 MB | 快速，推荐默认 |
-| Piper: Lessac（英文） | 1（女声） | 约 63 MB | 更高音质，下载更大 |
+The Local engine exposes only installed (downloaded) voices. Sherpa-onnx is licensed under Apache-2.0; the bundled model weights carry their own permissive licenses.
 
-本地引擎只展示已安装（已下载）的音色。sherpa-onnx 采用 Apache-2.0 许可；内置模型权重遵循各自的宽松许可。
+## Logs
 
-## 日志
+The Logs page supports querying by date, time range, level, and keyword; results can be copied or exported. The app automatically redacts audio base64 data in the logs to avoid overly long logs or leaking audio content.
 
-日志页支持按日期、时间段、级别和关键词查询，查询结果可复制或导出。应用会自动脱敏音频 base64 数据，避免日志过长或泄露音频内容。
+## Token Plan Nodes
 
-## Token Plan 节点
+If you use Token Plan, you can choose from the following nodes:
 
-如果使用 Token Plan，可选择以下节点：
-
-| 节点 | URL |
+| Node | URL |
 |------|-----|
-| 中国区 | `https://token-plan-cn.xiaomimimo.com` |
-| 新加坡 | `https://token-plan-sgp.xiaomimimo.com` |
-| 欧洲 | `https://token-plan-ams.xiaomimimo.com` |
+| China | `https://token-plan-cn.xiaomimimo.com` |
+| Singapore | `https://token-plan-sgp.xiaomimimo.com` |
+| Europe | `https://token-plan-ams.xiaomimimo.com` |
 
-> Token Plan 可能仅限用于编程开发场景，将其接入第三方应用进行语音合成可能违反小米服务条款，导致账号被封禁。建议使用按量计费模式。
+> Token Plan may be restricted to programming/development scenarios. Connecting it to third-party apps for speech synthesis may violate Xiaomi's terms of service and lead to account suspension. Pay-as-you-go billing is recommended.
 
-## 技术栈
+## Tech Stack
 
-- **语言**: Kotlin
+- **Language**: Kotlin
 - **UI**: Jetpack Compose + Material 3
-- **存储**: Room + DataStore
-- **网络**: OkHttp
-- **音频**: Android AudioTrack
-- **离线 TTS**: sherpa-onnx（原生 ONNX 运行时）
-- **最低版本**: Android 8.0 (API 26)
+- **Storage**: Room + DataStore
+- **Network**: OkHttp
+- **Audio**: Android AudioTrack
+- **Offline TTS**: sherpa-onnx (native ONNX runtime)
+- **Minimum version**: Android 8.0 (API 26)
 
-## 构建
+## Build
 
 ```bash
-# Debug 版本
+# Debug build
 ./gradlew assembleDebug
 
-# Release 版本（需配置签名）
+# Release build (requires signing configuration)
 ./gradlew assembleRelease
 ```
 
-## 免责声明
+## Disclaimer
 
-本软件为开源项目，仅供学习和个人使用，严禁用于任何违法违规用途。使用本软件即表示您已阅读并同意 [MiMo 用户协议](https://platform.xiaomimimo.com/docs/terms/user-agreement) 和 [MiMo 隐私政策](https://privacy.mi.com/XiaomiMiMoPlatform/zh_CN/)。
+This software is an open-source project intended for learning and personal use only. Any illegal or improper use is strictly prohibited. By using this software you acknowledge that you have read and agree to the [MiMo User Agreement](https://platform.xiaomimimo.com/docs/terms/user-agreement) and the [MiMo Privacy Policy](https://privacy.mi.com/XiaomiMiMoPlatform/zh_CN/).
 
-## 致谢
+## Acknowledgements
 
-- [MiMo TTS](https://platform.xiaomimimo.com?ref=S5T7WV) — 小米 MiMo 语音合成 API
-- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) — Apache-2.0 许可的设备端 TTS 运行时，驱动本地离线引擎
+- [MiMo TTS](https://platform.xiaomimimo.com?ref=S5T7WV) — Xiaomi MiMo speech synthesis API
+- [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) — Apache-2.0 licensed on-device TTS runtime powering the Local (offline) engine
 
-## 许可证
+## License
 
-本项目基于 [MIT License](LICENSE) 开源。
+This project is open-sourced under the [MIT License](LICENSE).
