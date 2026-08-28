@@ -11,6 +11,36 @@ If, besides text-to-speech, you also need complete novel-reading features — on
 
 阅读 Vox and VoxEngine are independent projects; installing or using 阅读 Vox does not depend on VoxEngine. 阅读 Vox can configure MiMo cloud TTS directly from within the app; if VoxEngine is already installed, you can set it as the Android system TTS and use it from 阅读 Vox or any other app.
 
+## Free — no account, no API key, even fully offline
+
+VoxEngine is **free to use**. Two of its engines need **no account, no API key, and no payment** — and one of them works with **no internet connection at all**, keeping your text on your device.
+
+### Local (Offline) Voice Engine — fully private, works offline
+
+Built on [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx), this engine synthesizes **entirely on your device**: no network connection, no API key, and nothing is uploaded — your text stays private.
+
+- **On-demand download** — models are ~25–65 MB and are downloaded once, then cached on-device for unlimited offline use.
+- **English-first** — natural English voices out of the box, plus a higher-quality alternative.
+
+**How it works:**
+
+1. In **Settings → Engine Selection**, choose **Local (Offline)**.
+2. In **Settings → Local / Offline Voices**, tap **Download** to install a model. Models are ~25–65 MB and are cached on your device after download (download once, use offline forever).
+3. Pick one of the installed voices as your default voice and read/listen offline.
+
+**Available models:**
+
+| Model | Voices | Size | Notes |
+|-------|--------|------|-------|
+| Kitten (English) | 8 (4 male, 4 female) | ~25 MB | Fast, recommended default |
+| Piper: Lessac (English) | 1 (female) | ~63 MB | Higher quality, larger download |
+
+The Local engine exposes only installed (downloaded) voices. Sherpa-onnx is licensed under Apache-2.0; the bundled model weights carry their own permissive licenses.
+
+### Microsoft Edge TTS — free neural voices, no API key
+
+Edge TTS provides **free neural voices** with no API key required and is great for English and Japanese content. Combined with the Local engine, you get high-quality free speech with zero setup and zero cost.
+
 ## Features
 
 - **Pluggable engine architecture** — unified interface design; currently supports MiMo TTS, Microsoft Edge TTS (free, no API key), and Local (offline/sherpa-onnx)
@@ -27,45 +57,6 @@ If, besides text-to-speech, you also need complete novel-reading features — on
 - **Clone voice throttling settings** — the request interval, retry count, and retry wait for clone/design voices can be adjusted in the reader settings
 - **Log query & export** — query logs by date, time range, level, and keyword; copy or export the results
 - **Voice import/export** — export custom voices to JSON files for easy backup and sharing
-
-## Setting up MiMo TTS
-
-### 1. Register on the MiMo platform
-
-Go to the [Xiaomi MiMo TTS platform](https://platform.xiaomimimo.com?ref=S5T7WV), register an account, and create an API Key in the console.
-
-MiMo offers two billing modes:
-
-| Billing mode | API Key format | Description |
-|--------------|----------------|-------------|
-| Pay-as-you-go | `sk-xxxxx` | Free for a limited time, billed per call |
-| Token Plan | `tp-xxxxx` | Requires purchasing a Token plan; China / Singapore / Europe nodes available |
-
-> New users are recommended to use **pay-as-you-go** billing (currently free for a limited time); the API Key starts with `sk-`.
-
-### 2. Copy the API Key
-
-After creating it, copy the API Key.
-
-### 3. Enter the API Key in VoxEngine
-
-Open VoxEngine → Settings page, choose the billing mode, enter the API Key, and tap "Save API Configuration". Then pick your preferred default voice and style.
-
-### 4. Open the system TTS settings
-
-On the VoxEngine settings page tap "Go to Settings" to jump to the system text-to-speech settings page.
-
-### 5. Switch the preferred engine (step one)
-
-In the system TTS settings, tap "Preferred engine".
-
-### 6. Select VoxEngine (step two)
-
-Select **VoxEngine** from the engine list. Done!
-
-Now any app that supports system TTS (such as 阅读 Vox) can use VoxEngine directly for speech synthesis.
-
-> Using it in 阅读 Vox: make sure VoxEngine is set as the system default engine, then open 阅读 Vox → reading screen → reading settings → engine & voice, and select the corresponding system TTS.
 
 ## Built-in Reading & Listening
 
@@ -117,40 +108,9 @@ Generate a custom voice from a text description, for example:
 
 You can choose a default style in the settings. To avoid the engine reading the prompt itself, the app no longer appends `(style)` to the body text. The system TTS language is reported automatically based on the current default voice: English content is best paired with an English voice, and Japanese content is best paired with an Edge Japanese voice.
 
-## Local (Offline) Voice Engine
-
-Beyond the online engines (MiMo and Edge), VoxEngine includes a fully **offline** engine built on [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). It needs no network connection, no API key, and keeps your text on-device — fully private.
-
-### How it works
-
-1. In **Settings → Engine Selection**, choose **Local (Offline)**.
-2. In **Settings → Local / Offline Voices**, tap **Download** to install a model. Models are ~25–65 MB and are cached on your device after download (download once, use offline forever).
-3. Pick one of the installed voices as your default voice and read/listen offline.
-
-### Available models
-
-| Model | Voices | Size | Notes |
-|-------|--------|------|-------|
-| Kitten (English) | 8 (4 male, 4 female) | ~25 MB | Fast, recommended default |
-| Piper: Lessac (English) | 1 (female) | ~63 MB | Higher quality, larger download |
-
-The Local engine exposes only installed (downloaded) voices. Sherpa-onnx is licensed under Apache-2.0; the bundled model weights carry their own permissive licenses.
-
 ## Logs
 
 The Logs page supports querying by date, time range, level, and keyword; results can be copied or exported. The app automatically redacts audio base64 data in the logs to avoid overly long logs or leaking audio content.
-
-## Token Plan Nodes
-
-If you use Token Plan, you can choose from the following nodes:
-
-| Node | URL |
-|------|-----|
-| China | `https://token-plan-cn.xiaomimimo.com` |
-| Singapore | `https://token-plan-sgp.xiaomimimo.com` |
-| Europe | `https://token-plan-ams.xiaomimimo.com` |
-
-> Token Plan may be restricted to programming/development scenarios. Connecting it to third-party apps for speech synthesis may violate Xiaomi's terms of service and lead to account suspension. Pay-as-you-go billing is recommended.
 
 ## Tech Stack
 
@@ -171,6 +131,61 @@ If you use Token Plan, you can choose from the following nodes:
 # Release build (requires signing configuration)
 ./gradlew assembleRelease
 ```
+
+## MiMo TTS (cloud — requires an API key)
+
+In addition to the free engines above, VoxEngine also supports **MiMo TTS**, Xiaomi's cloud neural voice API. It is a paid, cloud service and requires an API key.
+
+### Setting up MiMo TTS
+
+#### 1. Register on the MiMo platform
+
+Go to the [Xiaomi MiMo TTS platform](https://platform.xiaomimimo.com?ref=S5T7WV), register an account, and create an API Key in the console.
+
+MiMo offers two billing modes:
+
+| Billing mode | API Key format | Description |
+|--------------|----------------|-------------|
+| Pay-as-you-go | `sk-xxxxx` | Free for a limited time, billed per call |
+| Token Plan | `tp-xxxxx` | Requires purchasing a Token plan; China / Singapore / Europe nodes available |
+
+> New users are recommended to use **pay-as-you-go** billing (currently free for a limited time); the API Key starts with `sk-`.
+
+#### 2. Copy the API Key
+
+After creating it, copy the API Key.
+
+#### 3. Enter the API Key in VoxEngine
+
+Open VoxEngine → Settings page, choose the billing mode, enter the API Key, and tap "Save API Configuration". Then pick your preferred default voice and style.
+
+#### 4. Open the system TTS settings
+
+On the VoxEngine settings page tap "Go to Settings" to jump to the system text-to-speech settings page.
+
+#### 5. Switch the preferred engine (step one)
+
+In the system TTS settings, tap "Preferred engine".
+
+#### 6. Select VoxEngine (step two)
+
+Select **VoxEngine** from the engine list. Done!
+
+Now any app that supports system TTS (such as 阅读 Vox) can use VoxEngine directly for speech synthesis.
+
+> Using it in 阅读 Vox: make sure VoxEngine is set as the system default engine, then open 阅读 Vox → reading screen → reading settings → engine & voice, and select the corresponding system TTS.
+
+### Token Plan Nodes
+
+If you use Token Plan, you can choose from the following nodes:
+
+| Node | URL |
+|------|-----|
+| China | `https://token-plan-cn.xiaomimimo.com` |
+| Singapore | `https://token-plan-sgp.xiaomimimo.com` |
+| Europe | `https://token-plan-ams.xiaomimimo.com` |
+
+> Token Plan may be restricted to programming/development scenarios. Connecting it to third-party apps for speech synthesis may violate Xiaomi's terms of service and lead to account suspension. Pay-as-you-go billing is recommended.
 
 ## Disclaimer
 
