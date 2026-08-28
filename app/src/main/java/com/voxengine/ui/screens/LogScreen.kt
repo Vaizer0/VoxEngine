@@ -59,7 +59,8 @@ fun LogScreen() {
     val scope = rememberCoroutineScope()
     var dates by remember { mutableStateOf(emptyList<String>()) }
     var selectedDate by remember { mutableStateOf("") }
-    var level by remember { mutableStateOf("All") }    var startTime by remember { mutableStateOf("00:00") }
+    var level by remember { mutableStateOf("All") }
+    var startTime by remember { mutableStateOf("00:00") }
     var endTime by remember { mutableStateOf("23:59") }
     var keyword by remember { mutableStateOf("") }
     var entries by remember { mutableStateOf(emptyList<LogManager.LogEntry>()) }
